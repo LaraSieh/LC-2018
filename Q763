@@ -1,0 +1,51 @@
+763. Partition Labels
+
+A string S of lowercase letters is given. We want to partition this string into as many parts as possible so that each letter appears in at most one part, and return a list of integers representing the size of these parts.
+
+Example 1:
+Input: S = "ababcbacadefegdehijhklij"
+Output: [9,7,8]
+Explanation:
+The partition is "ababcbaca", "defegde", "hijhklij".
+This is a partition so that each letter appears in at most one part.
+A partition like "ababcbacadefegde", "hijhklij" is incorrect, because it splits S into less parts.
+Note:
+
+S will have length in range [1, 500].
+S will consist of lowercase letters ('a' to 'z') only.
+
+// solution 1
+
+class Solution {
+const int CHAR_COUNTS = 26;
+public:
+    vector<int> partitionLabels(string S) {
+        vector<pair<int,bool>> counts(CHAR_COUNTS,make_pair(0,false));
+        vector<int> result;
+        
+        for (char c : S) {
+            counts[c-'a'].first ++;
+            counts[c-'a'].second = true;
+        }
+        
+        int curCount = 0, charCount=0;
+        for (char c : S) {
+            int i = static_cast<int>(c-'a'); 
+            -- counts[i].first;
+            ++ curCount;
+            if (counts[i].second == true) {
+                ++ charCount;
+                counts[i].second = false;
+            }
+            if (counts[i].first == 0) {
+                -- charCount;
+                if (charCount == 0) {
+                    result.push_back(curCount);
+                    curCount = 0;
+                }
+            }
+        }
+        
+        return result;
+    }
+};

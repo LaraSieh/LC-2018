@@ -14,7 +14,7 @@ Note:
 S will have length in range [1, 500].
 S will consist of lowercase letters ('a' to 'z') only.
 
-// solution 1
+// solution 1 (12ms)
 
 class Solution {
 const int CHAR_COUNTS = 26;
@@ -43,6 +43,33 @@ public:
                     result.push_back(curCount);
                     curCount = 0;
                 }
+            }
+        }
+        
+        return result;
+    }
+};
+
+
+// solution 2  (8ms)
+class Solution {
+const int CHAR_COUNTS = 26;
+public:
+    vector<int> partitionLabels(string S) {
+        vector<int> positions(CHAR_COUNTS,-1);
+        vector<int> result;
+        
+        for (int i=0; i<S.size(); ++i) {
+            positions[S[i]-'a'] = i;
+        }
+        
+        int first=0, last=0;
+        for (int i=0; i<S.size(); ++i) {
+            int index = static_cast<int>(S[i] - 'a');
+            last = max(last, positions[index]);
+            if (last == i) {
+                result.push_back(last-first+1);
+                first = last+1;
             }
         }
         

@@ -37,7 +37,7 @@ public:
 };
 
 
-// solution 2
+// solution 2  == 34ms
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
@@ -53,6 +53,23 @@ public:
                 longest = max(longest, i-start+1);
             }
             
+            indexes[s[i]] = i;
+        }
+
+        return longest;
+    }
+};
+
+// solution 3 == 36ms
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int longest=0, len=s.size();
+        vector<int> indexes(256, -1);
+        
+        for (int i=0,start=0; i<len;++i) {
+            start = start <= indexes[s[i]] ? (indexes[s[i]]+1) : start; 
+            longest = max(longest, i-start+1);
             indexes[s[i]] = i;
         }
 

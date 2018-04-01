@@ -44,3 +44,8 @@ public:
         return s.substr(start,maxLen);
     }
 };
+
+
+// O(n) linear
+
+https://articles.leetcode.com/longest-palindromic-substring-part-ii/

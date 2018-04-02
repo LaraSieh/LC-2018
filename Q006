@@ -1,0 +1,55 @@
+
+
+
+case 1: if(numRows==1 || s.size()<=numRows) return s;
+case 2: generate numRows sequences, join them sequentially, all indices less than s.size().
+	stepcount=numRows+numRows-2=(numRows-1)*2, for i= 0 to numRows-1, the ith sequence, first is s[i], 
+	2a. for 0th and n-1 th sequence, the step equal to stepcount
+	2b. for other, sum of two successive step equal to stepcount,
+		the odd one is stepcount-(i*2), the even one is (i*2)
+    
+// solution 1, 37ms    
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        int len = s.size();
+        if (len <= numRows || numRows < 2) return s;
+        
+        string converted(len,0);
+        int step=(numRows-1)*2, cur=0; 
+        for (int i=0; i<numRows;++i) {
+            if (i==0 || i==(numRows-1)) {
+                for (int j=i;j<len;j+=step) {
+                    converted[cur++] = s[j];
+                }
+            } else {
+            // k interchanges between 2i and 2(n-1)-2i
+            // i.e. j increases as i, 2(n-1)-i,2(n-1)+i,
+                for (int j=i,k=i<<1;j<len;k=step-k,j+=k)
+                    converted[cur++]=s[j];
+            }
+        }
+        
+        return converted;        
+    }
+};
+
+
+//solution 2, 29ms
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        if (numRows==1) return s;
+        vector<string> zigzag(numRows, "");
+        int twoCols = 2*numRows - 2;
+        for (int i=0; i<s.size(); ++i) {
+            zigzag[abs(numRows-1-i%twoCols)] += s[i];
+        }
+        string z;
+        for (int i=numRows-1; i>=0; --i) {
+            z += zigzag[i];
+        }
+        return z;
+//        return accumulate(zigzag.rbegin(),zigzag.rend(),string(""));
+    }
+};

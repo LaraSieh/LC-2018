@@ -1,0 +1,37 @@
+
+
+//S1 
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x<0) return false;
+        
+        int temp = x, reversed = 0;
+        
+        while (temp) {
+        // what happens if overflow?
+            reversed = reversed*10 + temp%10;
+            temp /= 10;
+        }
+        
+        return (reversed == x);   
+    }
+};
+
+
+//S2 
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x<0 || (x%10==0 && x!=0)) return false;
+        
+        int temp = x, reversed = 0;  
+        while (temp>reversed) {
+        // this way it can avoid overflow
+            reversed = reversed*10 + temp%10;
+            temp /= 10;
+        }
+        
+        return ((reversed==temp) || (temp==reversed/10));   
+    }
+};

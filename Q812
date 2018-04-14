@@ -1,0 +1,35 @@
+
+812. Largest Triangle Area
+DescriptionHintsSubmissionsDiscussSolution
+You have a list of points in the plane. Return the area of the largest triangle that can be formed by any 3 of the points.
+
+Example:
+Input: points = [[0,0],[0,1],[1,0],[0,2],[2,0]]
+Output: 2
+Explanation: 
+The five points are show in the figure below. The red triangle is the largest.
+
+class Solution {
+public:
+    double largestTriangleArea(vector<vector<int>>& points) {
+        int numPoints = points.size();
+        
+        double maxArea = 0;
+        for (int i=0; i<numPoints-2; ++i) {
+            for (int j=i+1; j<numPoints-1; ++j) {
+               for (int k=j+1; k<numPoints; ++k) {
+                   maxArea = max(maxArea, triangleArea(points[i],points[j],points[k]));
+               }   
+            }
+        }
+        return maxArea;
+    }
+    
+    //using shoelace formula to calculate triangle area
+    double triangleArea(vector<int>& p1, vector<int>& p2, vector<int>& p3) {
+        // {A} ={\frac {1}{2}}|x_{1}y_{2}+x_{2}y_{3}+x_{3}y_{1}-x_{2}y_{1}-x_{3}y_{2}-x_{1}y_{3}|}
+        
+        return (0.5* abs((double)(p1[0])*double(p2[1]) + (double)(p2[0])*(double)(p3[1]) + (double)(p3[0])*(double)(p1[1]) 
+                - (double)(p2[0])*(double)(p1[1]) -(double)(p3[0])*(double)(p2[1]) -(double)(p1[0])*(double)(p3[1])));
+    }
+};

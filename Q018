@@ -1,0 +1,60 @@
+
+
+18. 4Sum
+DescriptionHintsSubmissionsDiscussSolution
+Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
+
+Note:
+
+The solution set must not contain duplicate quadruplets.
+
+Example:
+
+Given array nums = [1, 0, -1, 0, -2, 2], and target = 0.
+
+A solution set is:
+[
+  [-1,  0, 0, 1],
+  [-2, -1, 1, 2],
+  [-2,  0, 0, 2]
+]
+
+class Solution {
+public:
+    vector<vector<int>> fourSum(vector<int>& nums, int target) {
+        int len = nums.size();
+        vector<vector<int>> result;
+        
+        sort(nums.begin(), nums.end());
+        
+        for (int i=0; i<len-3; ++i) {
+//            if (nums[i] > target) 
+//                return result;
+            for (int j=i+1; j<len-2; ++j) {
+//                if (nums[i]+nums[j]>target) 
+//                    break;
+                int left=j+1,right=len-1;
+                while (left<right) {
+                    int sum=nums[left]+nums[right]+nums[i]+nums[j];
+                    if (sum==target) {
+                        int first = nums[left], second=nums[right];
+                        result.push_back({nums[i],nums[j],first,second});
+                        
+                        while ((left<right) && nums[left]==first) ++left;
+                        while ((left<right) && nums[right]==second) --right;
+                    } else if (sum>target) {
+                        --right;
+                    } else { // sum < target
+                        ++left;
+                    }
+                }
+                
+                while (j+1<len && nums[j+1]==nums[j]) ++j;
+            }
+            
+            while (i+1<len && nums[i+1]==nums[i]) ++i;
+        }
+        
+        return result;
+    }
+};

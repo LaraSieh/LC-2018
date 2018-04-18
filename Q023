@@ -140,3 +140,68 @@ public:
 
 
 // priority
+class Solution {
+public:
+    struct compare {
+        bool operator()(const ListNode *l1, const ListNode *l2) { 
+            return l1->val > l2->val;
+        }
+    };
+    
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        // use priority queue
+        priority_queue<ListNode*, vector<ListNode*>, compare> q;
+        
+        for (auto &list : lists) {
+            if (list) q.push(list);
+        }
+        
+        if (q.empty()) return NULL;
+        
+        ListNode *merged = q.top();
+        q.pop();
+        if (merged->next) q.push(merged->next);
+        ListNode *tail = merged;
+        while (!q.empty()) {
+            tail->next = q.top();
+            q.pop();
+            tail = tail->next;
+            if (tail->next) 
+                q.push(tail->next);
+        }
+        
+        return merged;
+    }
+};
+
+
+// heap solution
+class Solution {
+public:
+    static bool comp(const ListNode *l1, const ListNode *l2) { 
+            return l1->val > l2->val;
+    }
+    
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        // use priority queue
+        ListNode dummy(0), *cur =&dummy;
+        vector<ListNode*> v;
+        for (auto l : lists) {
+            if (l) v.push_back(l);
+        }
+        
+        make_heap(v.begin(),v.end(),comp);
+        
+        while(!v.empty()) {
+            cur->next = v.front();
+            pop_heap(v.begin(),v.end(),comp);
+            v.pop_back();
+            cur = cur->next;
+            if (cur->next) {
+                v.push_back(cur->next);
+                push_heap(v.begin(),v.end(),comp);
+            }
+        } 
+        return dummy.next;
+    }
+};

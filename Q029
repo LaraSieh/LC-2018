@@ -1,0 +1,83 @@
+29. Divide Two Integers
+Given two integers dividend and divisor, divide two integers without using multiplication, division and mod operator.
+
+Return the quotient after dividing dividend by divisor.
+
+The integer division should truncate toward zero.
+
+Example 1:
+
+Input: dividend = 10, divisor = 3
+Output: 3
+Example 2:
+
+Input: dividend = 7, divisor = -3
+Output: -2
+Note:
+
+Both dividend and divisor will be 32-bit signed integers.
+The divisor will never be 0.
+Assume we are dealing with an environment which could only store integers within the 32-bit signed integer range: [−231,  231 − 1]. 
+For the purpose of this problem, assume that your function returns 231 − 1 when the division result overflows.
+
+
+
+// solution 1
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if (dividend==0)
+            return 0;
+        // this check is necessary because overflow (INT_MIN/(-1) = 2147483648)
+        // can be casted to INT_MIN by using long long
+        // INT_MAX (2^31 - 1, 2147483647) 
+        // INT_MIN (-2147483648) 
+        if (divisor==0 || (dividend==INT_MIN && divisor==-1))
+            return INT_MAX;
+        
+        long long dvd = labs(dividend);
+        long long dvs = labs(divisor);
+        int quotient = 0;
+        
+        while (dvd >= dvs) {
+           long long t = dvs, multiple = 1;
+            while (dvd >= (t << 1)) {
+                t <<= 1;
+                multiple <<=1;
+            }
+            dvd -= t;
+            quotient += multiple;
+        }
+        
+        if ((dividend<0) ^ (divisor<0))
+            quotient = -quotient;
+        cout << quotient << endl;
+        
+        return quotient;
+    }
+};
+
+
+// using log, really?
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if (dividend==0)
+            return 0;
+        
+        // have to use fabs instead of abs because abs(INT_MIN) would overflow
+        double t1 = log(fabs(dividend));
+        double t2 = log(fabs(divisor));
+
+        
+        long long result = double(exp(t1-t2));
+        
+        if ((dividend<0) ^ (divisor<0)) 
+            result = -result;
+        
+        if (result>INT_MAX) 
+            result=INT_MAX;
+        return result;
+        
+    }
+};

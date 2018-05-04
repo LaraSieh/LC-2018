@@ -16,6 +16,7 @@ Input:
   words = ["word","student"]
 Output: []
 
+// solution one, straightforward 151ms
 class Solution {
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
@@ -44,6 +45,40 @@ public:
             }
             if (total==nWords) {
                 indexes.push_back(i);
+            }
+        }        
+        return indexes;
+    }
+};
+
+
+// solution 2, window 37ms
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        vector<int> indexes;
+        unordered_map<string,int> dict;
+        
+        int nWords=words.size();
+        if (nWords==0) return vector<int>{};
+        
+        for (auto &word : words) {
+            ++dict[word];
+        }
+                
+        int len=words[0].size(), lenString=s.size(), total=len*nWords;
+        for (int i=0; i<len;++i) {
+            int count=0;
+            auto bookkeeping=dict;
+            
+            for (int j=i; j<=(lenString-len);j+=len) {
+                if (--bookkeeping[s.substr(j,len)]>=0)
+                    ++count;
+                if (((j-i)>=total) && (++bookkeeping[s.substr(j-total,len)]>0))
+                    --count;
+                if (count==nWords) {
+                    indexes.push_back(j-total+len);
+                }
             }
         }        
         return indexes;

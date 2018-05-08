@@ -1,0 +1,75 @@
+32. Longest Valid Parentheses
+Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.
+
+Example 1:
+
+Input: "(()"
+Output: 2
+Explanation: The longest valid parentheses substring is "()"
+Example 2:
+
+Input: ")()())"
+Output: 4
+Explanation: The longest valid parentheses substring is "()()"
+
+
+// Solution 1, time O(n), space O(1)
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        int longest=0, len=s.size();
+        
+        int left=0, right=0;
+        for (int i=0; i<len; ++i) {
+            if (s[i]=='(') ++left;
+            if (s[i]==')') ++right;
+            
+            if (left==right) {
+                longest = max(longest,left+right);
+            } else if (right>left) {
+                left=0;
+                right=0;
+            }
+        }
+        
+        left=0; right=0;
+        for (int i=len-1; i>=0; --i) {
+            if (s[i]=='(') ++left;
+            if (s[i]==')') ++right;
+            
+            if (left==right) {
+                longest = max(longest,left+right);
+            } else if (left>right) {
+                left=0;
+                right=0;
+            }
+        }
+        
+        return longest;
+    }
+};
+
+// solution 2, stack version, time O(n), space O(n) 
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        int longest=0, len=s.size();
+        stack<int> indexes;  // stack to store indexes
+                
+        indexes.push(-1);
+
+        for (int i=0; i<len; ++i) {
+            if (s[i]=='(') 
+                indexes.push(i);
+            else {
+                indexes.pop();
+                if (indexes.empty()) {
+                    indexes.push(i);
+                } else {
+                    longest = max(longest, i-indexes.top());
+                }
+            }
+        }
+        return longest;
+    }
+};

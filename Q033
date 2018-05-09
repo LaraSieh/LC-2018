@@ -18,7 +18,7 @@ Example 2:
 Input: nums = [4,5,6,7,0,1,2], target = 3
 Output: -1
 
-
+// O(lg(n)), 9ms
 class Solution {
 public:
     int search(vector<int>& nums, int target) {
@@ -42,6 +42,23 @@ public:
                 else // nums[mid]>=nums[left] || nums[mid]<=target
                     left = mid+1;
             }
+        }
+        
+        return -1;
+    }
+};
+
+
+// linear, 10ms
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int len=nums.size();
+        
+        // using linear method just to check how slow it is
+        for (int i=0; i<len; ++i) {
+            if (nums[i]==target)
+                return i;
         }
         
         return -1;

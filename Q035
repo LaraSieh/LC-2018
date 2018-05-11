@@ -1,0 +1,50 @@
+35. Search Insert Position
+Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+You may assume no duplicates in the array.
+
+
+
+// linear
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int len=nums.size(), left=0, right=len-1;
+        
+        while (left<=right) {
+            if (nums[left]==target)
+                return left;
+            if (nums[right]==target)
+                return right;   
+            else if (nums[left]>target) {
+                return left;
+            } else if (nums[right]<target) {
+                return right+1;
+            }
+            
+            // nums[left]<target<nums[right]
+            ++left;
+            --right;
+        }
+        return left;    
+    }
+};
+
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int len=nums.size(), left=0, right=len-1;
+
+        while(left<=right)
+        {
+            int mid = left + (right-left)/2;
+            if (target == nums[mid])
+                return mid;
+            else if (target < nums[mid])     
+                right = mid-1;
+            else // target > nums[mid] 
+                left = mid+1;
+        }
+        return left;
+    }
+};

@@ -1,0 +1,76 @@
+46. Permutations
+Given a collection of distinct integers, return all possible permutations.
+
+Example:
+
+Input: [1,2,3]
+Output:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+
+//straight forward
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<int> line;
+        
+        permute(nums, 0, line);
+        
+        return answer;
+    }
+    
+    void permute(vector<int>& nums, int index, vector<int>& line) {
+        int n=nums.size(); 
+        
+        if (index==n) {
+            answer.push_back(line);
+            return;
+        }
+        
+        for (int i=index; i<n; ++i) {
+            swap(nums[index],nums[i]);
+            line.push_back(nums[index]);
+            permute(nums,index+1,line);
+            line.pop_back();
+            swap(nums[i],nums[index]);
+        }
+    }
+    
+private:
+    vector<vector<int>> answer;
+    
+};
+
+//  some improvement
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        permute(nums, 0);        
+        return answer;
+    }
+    
+    void permute(vector<int>& nums, int index) {
+        int n=nums.size(); 
+        
+        if (index==n) {
+            answer.push_back(nums);
+            return;
+        }
+        
+        for (int i=index; i<n; ++i) {
+            swap(nums[index],nums[i]);
+            permute(nums,index+1);
+            swap(nums[i],nums[index]);
+        }
+    }
+    
+private:
+    vector<vector<int>> answer;
+    
+};

@@ -1,0 +1,52 @@
+
+52. N-Queens II
+The n-queens puzzle is the problem of placing n queens on an n×n chessboard such that no two queens attack each other.
+
+
+
+Given an integer n, return the number of distinct solutions to the n-queens puzzle.
+
+Example:
+
+Input: 4
+Output: 2
+Explanation: There are two distinct solutions to the 4-queens puzzle as shown below.
+[
+ [".Q..",  // Solution 1
+  "...Q",
+  "Q...",
+  "..Q."],
+
+ ["..Q.",  // Solution 2
+  "Q...",
+  "...Q",
+  ".Q.."]
+]
+
+
+class Solution {
+public:
+    int totalNQueens(int n) {
+        int count = 0; 
+        vector<bool> flags(5*n,false);  // flag array to check if the position is available
+                                      // actually 5n-2 is needed but make it 5n for simplicity
+                                      // [1,n-1] for col, [n,3n-2] for 45d diagonal, [3n+1, 5n] for 135d diagonal
+        dfs(count,flags,0,n);
+        return count;
+    }
+    
+    void dfs(int& count, vector<bool>& flags, int row, int n) {
+        if (row==n) {
+            ++count;
+            return;
+        }
+        for (int i=0; i<n; ++i) {
+            if (!flags[i] && !flags[row+i+n] && !flags[4*n+row-i]) {
+                flags[i]=true; flags[row+i+n]=true; flags[4*n+row-i]=true;
+                dfs(count, flags, row+1, n);
+                flags[i]=false; flags[row+i+n]=false; flags[4*n+row-i]=false;
+            }
+        }
+        return;
+    }
+};

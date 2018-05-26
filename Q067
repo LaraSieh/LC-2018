@@ -1,0 +1,97 @@
+67. Add Binary
+DescriptionHintsSubmissionsDiscussSolution
+Given two binary strings, return their sum (also a binary string).
+
+The input strings are both non-empty and contains only characters 1 or 0.
+
+Example 1:
+
+Input: a = "11", b = "1"
+Output: "100"
+Example 2:
+
+Input: a = "1010", b = "1011"
+Output: "10101"
+
+
+// slow 
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        int carry = 0;
+        string answer;
+        for (int i = static_cast<int>(a.size()) - 1, j = static_cast<int>(b.size()) - 1; i >= 0 || j >=0; --i, --j) {
+            int s = carry + (i >= 0 ? a[i] - '0' : 0) + (j >= 0 ? b[j] - '0' : 0); 
+            answer = static_cast<char>((s % 2) + '0') + answer;
+            carry = s / 2;
+        }
+    
+        if (carry) {
+            answer = static_cast<char>(carry + '0') + answer;
+        }
+    
+        return answer;
+        
+    }
+};
+
+// little improvement
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        if(b.length() > a.length())
+            swap(a, b);
+        
+        // at this moment a is longer than b
+        int la = a.length(), lb = b.length(), carry=0;
+        string answer;
+        for (int ia=la-1,ib=lb-1; ib>=0; --ib,--ia) {
+            int i1 = static_cast<int>(a[ia]-'0');
+            int i2 = static_cast<int>(b[ib]-'0');
+            
+            answer = static_cast<char>((i1^i2^carry)+'0') + answer;
+            carry = (i1+i2+carry) >> 1;
+        }
+        
+        // rest of string a
+        for (int i=la-lb-1; i>=0; --i) {
+            int i1 = static_cast<int>(a[i]-'0');
+            answer = static_cast<char>((i1^carry)+'0') + answer;
+            carry = (i1+carry) >> 1; 
+        }
+        if (carry>0) {
+            answer = static_cast<char>(carry+'0') + answer;
+        }
+        return answer;
+    }
+};
+
+// final version
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        if(b.length() > a.length())
+            swap(a, b);
+        
+        // at this moment a is longer than b
+        int la = a.length(), lb = b.length(), carry=0;
+        string answer;
+        for (int ia=la-1,ib=lb-1; ib>=0; --ib,--ia) {
+            int i = static_cast<int>(a[ia]-'0')+static_cast<int>(b[ib]-'0')+carry;
+            
+            answer = static_cast<char>((i%2)+'0') + answer;
+            carry = i >> 1;
+        }
+        
+        // rest of string a
+        for (int ia=la-lb-1; ia>=0; --ia) {
+            int i = static_cast<int>(a[ia]-'0')+carry;
+            answer = static_cast<char>((i%2)+'0') + answer;
+            carry = i >> 1; 
+        }
+        if (carry>0) {
+            answer = static_cast<char>(carry+'0') + answer;
+        }
+        return answer;
+    }
+};

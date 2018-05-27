@@ -124,7 +124,7 @@ public:
             }
             string s = words[i];
             for (int k=0; k<j-1; ++k ) {
-                if (i+j>=n) 
+                if (i+j==n) 
                     s+= " ";
                 else {
                     s += string((maxWidth-len)/(j-1)+(k<(maxWidth-len)%(j-1)), ' ');

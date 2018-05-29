@@ -1,0 +1,84 @@
+76. Minimum Window Substring
+
+Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
+
+Example:
+
+Input: S = "ADOBECODEBANC", T = "ABC"
+Output: "BANC"
+Note:
+
+If there is no such window in S that covers all characters in T, return the empty string "".
+If there is such window, you are guaranteed that there will always be only one unique minimum window in S.
+
+
+// solution: using map for general case
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        int ns = static_cast<int>(s.size()), nt=static_cast<int>(t.size());
+        int count=0, start=0, minLen = ns+1, minStart=0;
+        
+        map<char,int> cint;
+        
+        for (char c : t) {
+            ++cint[c];
+        }
+        
+        for (int i=0; i<ns; ++i) {
+            int c = s[i];
+            if (cint.find(c) != cint.end()) {
+                -- cint[c];
+                if (cint[c]>=0) ++count;
+                while (count == nt) {
+                    if (i-start+1 < minLen ) {
+                        minLen = i - start + 1;
+                        minStart = start;
+                    } 
+                    if (cint.find(s[start]) != cint.end()) {
+                        ++cint[s[start]];
+                        if (cint[s[start]]>0) --count;
+                    }
+                    ++start;
+                }
+            }
+        }
+        
+        return (minLen <= ns ? s.substr(minStart,minLen) : "");
+    }
+};
+
+// big improvement by replacing map with simple array
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        int ns = static_cast<int>(s.size()), nt=static_cast<int>(t.size());
+        int count=0, start=0, minLen = ns+1, minStart=0;
+        
+        vector<int> cint(128,0);
+        
+        for (char c : t) {
+            --cint[c];
+        }
+        
+        for (int i=0; i<ns; ++i) {
+            int c = s[i];
+            if (++cint[c] <= 0) {
+                ++count;
+            }
+            
+            while (count == nt) {
+                if (i-start+1 < minLen ) {
+                    minLen = i-start + 1;
+                    minStart = start;
+                } 
+                if (--cint[s[start]]<0) {
+                    --count;
+                }
+                ++start;
+            }
+        }
+        
+        return (minLen <= ns ? s.substr(minStart,minLen) : "");
+    }
+};

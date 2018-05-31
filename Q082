@@ -1,0 +1,76 @@
+82. Remove Duplicates from Sorted List II
+
+Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
+
+Example 1:
+
+Input: 1->2->3->3->4->4->5
+Output: 1->2->5
+Example 2:
+
+Input: 1->1->1->2->3
+Output: 2->3
+
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        ListNode dummy(0);
+        dummy.next = head;
+        ListNode *cur=head, *prev=&dummy;
+        while (cur && cur->next) {
+            if (cur->val == cur->next->val) {
+                int v = cur->val;
+                //todo: if the node needs to be deleted, do it here
+                while (cur && cur->val==v) {
+                    cur = cur->next;
+                }
+                prev->next = cur;
+            } else {
+                prev = cur;
+                cur = cur->next;
+            }
+        }
+        return dummy.next;
+    }
+};
+
+//solution: use pointer to pointer 
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {        
+        ListNode **pp=&head, *cur=head;
+        while ((cur=*pp) && (cur->next)) {
+            if (cur->val==cur->next->val) {
+                //todo: if the node needs to be deleted, do it here
+                while (cur->next && cur->val == cur->next->val) {
+                    cur = cur->next;
+                }
+                // at this point, cur->val!= cur->next->val or cur->next==null
+                *pp = cur->next;
+            } else {
+                pp = &(cur->next);
+            }
+        }
+        return head;
+    }
+};
+
+//simplify
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {        
+        ListNode **pp=&head, *cur=head;
+        while (cur) {
+            ListNode *save = cur;
+            while (cur->next && cur->val==cur->next->val) {
+                cur = cur->next;
+            }
+            if (save != cur)
+                *pp = cur->next;
+            else 
+                pp = &(cur->next);
+            cur =*pp;
+        }
+        return head;
+    }
+};

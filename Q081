@@ -59,8 +59,8 @@ public:
                 else
                     left = mid+1;
             }
-            else {
-                right--;
+            else { //nums[mid]==nums[right]
+                right--; //worst case O(n)
             }
         }
         return false;

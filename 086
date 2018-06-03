@@ -1,0 +1,63 @@
+86. Partition List
+
+Given a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.
+
+You should preserve the original relative order of the nodes in each of the two partitions.
+
+Example:
+
+Input: head = 1->4->3->2->5->2, x = 3
+Output: 1->2->2->4->3->5
+
+// first round
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode d1(0), d2(0), *less=&d1, *more=&d2;
+        d1.next = head;
+    
+        // less should be on less list and less->next is the one to be checked currently
+        while(less->next) {
+            ListNode *cur = less->next;
+            if (cur->val >= x) {
+                // remove cur from d1 less list and append to more list
+                less->next = cur->next;
+                more->next = cur;
+                cur->next = NULL; // end of more list                    
+                more = more->next;
+            } else 
+                less = less->next;
+        }
+        
+        less->next = d2.next;
+        
+        return d1.next;
+        
+    }
+};
+
+
+//cleanup and much faster
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode d1(0), d2(0), *less=&d1, *more=&d2;
+    
+        // less should be on less list and less->next is the one to be checked currently
+        while(head) {
+            if (head->val >= x) {
+                more->next = head;                    
+                more = more->next;
+            } else {
+                less->next = head;
+                less = less->next;
+            }
+            head = head->next;
+        }
+        
+        less->next = d2.next;
+        more->next = NULL; //<== it is important to nullify the end of list
+        return d1.next;
+        
+    }
+};

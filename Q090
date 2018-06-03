@@ -1,0 +1,44 @@
+90. Subsets II
+Given a collection of integers that might contain duplicates, nums, return all possible subsets (the power set).
+
+Note: The solution set must not contain duplicate subsets.
+
+Example:
+
+Input: [1,2,2]
+Output:
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+
+
+
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> allsets;
+        vector<int> oneset;
+        allsets.push_back(oneset);
+        
+        sort(nums.begin(), nums.end());
+        dfs(nums, 0, oneset, allsets);
+        
+        return allsets;
+    }
+    
+    void dfs(vector<int>& nums, int index, vector<int>& oneset, vector<vector<int>>& allsets) {
+        for (int i=index; i<nums.size();++i) {
+            if (i>index&&nums[i]==nums[i-1]) continue;
+            oneset.push_back(nums[i]);
+            //must push this before going into next recursion
+            allsets.push_back(oneset);
+            dfs(nums,i+1,oneset,allsets);
+            oneset.pop_back();
+        }
+    }
+};

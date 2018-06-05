@@ -1,0 +1,50 @@
+92. Reverse Linked List II
+
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int m, int n) {
+        ListNode dummy(0), *h=&dummy; 
+        dummy.next=head;
+        
+        int count=1; 
+        while (count++<m) {
+            h = head;
+            head = head->next;
+        } 
+        //at this point count==m
+        while (count++<=n) {
+            ListNode *n = h->next;
+            h->next = head->next;
+            head->next = head->next->next;
+            h->next->next = n;
+        }
+        
+        return dummy.next;
+    }
+};
+
+
+// small modification made hugh performance improvement
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int m, int n) {
+        ListNode dummy(0), *h=&dummy; 
+        dummy.next=head;
+        
+        int count=1; 
+        while (count++<m) {
+            h = head;
+            head = head->next;
+        } 
+        //at this point count==m
+        //h是翻转部分前的节点，head是反转后的尾节点
+        while (count++<=n) {
+            ListNode *n = head->next;  //avoid p->next->next;
+            head->next = n->next;
+            n->next = h->next;
+            h->next = n;
+        }
+        
+        return dummy.next;
+    }
+};

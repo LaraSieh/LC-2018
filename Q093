@@ -1,0 +1,45 @@
+93. Restore IP Addresses
+
+Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+
+Example:
+
+Input: "25525511135"
+Output: ["255.255.11.135", "255.255.111.35"]
+
+
+class Solution {
+public:
+    vector<string> list;
+    vector<string> restoreIpAddresses(string s) {
+ //       if (s.size()==0 || s.size()>12) return {};
+        
+        vector<string> ips;
+        createIpAddresses(s,0,"",ips);
+        return ips;
+    }
+    
+    void createIpAddresses(string s, int index, string ip, vector<string>& ips) {
+        if (index==4 && s.empty()) {
+            ip.erase(ip.begin()+ip.size()-1);
+            ips.push_back(ip);
+            return;
+        } 
+        if (index>=4)
+            return;
+        
+        for (int i=1; i<=3; ++i) {
+            
+            if (s.size()>=i && isValidIpNode(s.substr(0,i))) {
+                createIpAddresses(s.substr(i),index+1,ip+s.substr(0,i)+".",ips);
+            }
+        }
+    }
+    
+    bool isValidIpNode(string s) {
+        if (s.empty() || s.size()>3 || (s.size()>1&&s[0]=='0'))
+            return false;
+        int n = stoi(s);
+        return (n<=255&&n>=0);
+    }
+};

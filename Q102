@@ -1,0 +1,105 @@
+102. Binary Tree Level Order Traversal
+Given a binary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by level).
+
+For example:
+Given binary tree [3,9,20,null,null,15,7],
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its level order traversal as:
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+
+
+
+// two slightly different method, same perf
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        queue<TreeNode *> levelQ;
+        vector<vector<int>> levels;
+        
+        levelQ.push(root);
+        while (!levelQ.empty()) {
+            int levelNum = levelQ.size();
+            
+            vector<int> level;
+            while (levelNum--) {
+                TreeNode *cur = levelQ.front(); 
+                levelQ.pop(); 
+                if (cur) {
+                    level.push_back(cur->val);
+                    levelQ.push(cur->left);
+                    levelQ.push(cur->right);
+                }
+            }
+            if (!level.empty())
+                levels.push_back(level);
+        }
+        
+        return levels;
+    }
+};
+
+
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        queue<TreeNode *> levelQ;
+        vector<vector<int>> levels;
+        
+        if (root) {
+            levelQ.push(root);
+            levelQ.push(nullptr);
+        }
+        vector<int> level;
+        while (!levelQ.empty()) {
+            TreeNode *cur = levelQ.front(); 
+            levelQ.pop(); 
+                
+            if (cur) {
+                level.push_back(cur->val);
+                if (cur->left) levelQ.push(cur->left);
+                if (cur->right) levelQ.push(cur->right);
+            } else {
+                levels.push_back(level);
+                level.clear();
+                if (!levelQ.empty()) {
+                    levelQ.push(nullptr);
+                }
+            }
+        }
+            
+        return levels;
+    }
+};
+
+
+
+//super fast, 
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> lv; 
+        
+        LevelTraversal(root, 0, lv);
+        
+        return lv;
+    }
+    
+    void LevelTraversal(TreeNode *node, int level,vector<vector<int>>& lv) {
+        if (node == nullptr) 
+            return;
+        if (lv.size() <= level) {
+            lv.push_back(vector<int>{node->val}); 
+        } else
+            lv[level].push_back(node->val);
+        LevelTraversal(node->left, level+1, lv);
+        LevelTraversal(node->right, level+1, lv);
+    }
+};

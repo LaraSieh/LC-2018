@@ -1,0 +1,70 @@
+105. Construct Binary Tree from Preorder and Inorder Traversal
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+preorder = [3,9,20,15,7]
+inorder = [9,3,15,20,7]
+Return the following binary tree:
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+//straightforward, 22ms 
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        return buildSubTree(preorder,0,preorder.size()-1, inorder, 0, inorder.size()-1);
+    }
+    
+    // root is the first item in preorder
+    TreeNode *buildSubTree(vector<int>& preorder, int ps,int pe, vector<int>& inorder, int is, int ie) {
+        if (ps>pe || is>ie)
+            return nullptr;
+        
+        int rootIndex=0, n=pe-ps+1;
+        for (int i=0; i<n; ++i) {
+            if (inorder[i+is]==preorder[ps]) {
+                //find the root
+                rootIndex=i;
+                break;
+            }
+        }
+        
+        //left tree length is rootIndex-1
+        // so we can find for preorder left tree is [ps+1,ps+rootIndex], right tree is [is, is+rootIndex-1]
+        // for inorder, the left tree is [is,is+rootIndex-1], right tree is [is+rootIndex+1,ie]
+        TreeNode *root = new TreeNode(preorder[ps]);
+        root->left = buildSubTree(preorder, ps+1, ps+rootIndex, inorder, is, is+rootIndex-1);
+        root->right = buildSubTree(preorder, ps+rootIndex+1, pe, inorder, is+rootIndex+1, ie);
+        
+        return root;
+    }
+};
+
+//very elegant, 11ms
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        int p=0, i=0;
+        return buildSubTree(preorder, inorder, p, i, preorder.size());
+    }
+    
+    TreeNode *buildSubTree(vector<int>& preorder, vector<int>& inorder, int& p, int& i, int end) {
+        if ((i<inorder.size()) &&(end==inorder.size() || inorder[i] != preorder[end]))
+        {
+            TreeNode *root=new TreeNode(preorder[p++]);
+            root->left = buildSubTree(preorder,inorder,p,i,p-1);
+            ++i;
+            root->right = buildSubTree(preorder,inorder,p,i,end);
+            return root;
+        }
+        return nullptr;
+    }
+};

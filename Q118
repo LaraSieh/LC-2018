@@ -1,0 +1,44 @@
+
+
+
+
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        if (numRows<=0) return vector<vector<int>>{};
+        
+        vector<vector<int>> pascalList={{1}}; //slowest due to this assignment
+        for (int i=1; i<numRows; ++i) {
+            auto l = pascalList.back();
+            vector<int> list={1}; //slowest due to this assignment
+            
+            for (int j=0; j<l.size()-1; ++j) 
+                list.push_back(l[j]+l[j+1]);
+            
+            list.push_back(1);
+            pascalList.push_back(list);
+        }
+        return pascalList;
+    }
+};
+
+// faster by different initializer
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        if (numRows<=0) return vector<vector<int>>{};
+        
+        vector<vector<int>> pascalList(1,{1});
+        for (int i=1; i<numRows; ++i) {
+            auto l = pascalList.back();
+            vector<int> list(1,1); //vector<int> list({1}) is ok too
+            
+            for (int j=0; j<l.size()-1; ++j) 
+                list.push_back(l[j]+l[j+1]);
+            
+            list.push_back(1);
+            pascalList.push_back(list);
+        }
+        return pascalList;
+    }
+};

@@ -1,0 +1,81 @@
+202. Happy Number
+Write an algorithm to determine if a number is "happy".
+
+A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits, and repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process ends in 1 are happy numbers.
+
+Example: 
+
+Input: 19
+Output: true
+Explanation: 
+12 + 92 = 82
+82 + 22 = 68
+62 + 82 = 100
+12 + 02 + 02 = 1
+
+
+
+class Solution {
+public:
+    bool isHappy(int n) {
+        unordered_set<int> existed{1};
+        
+        int sum=n;
+        while (existed.find(sum) == existed.end()) {
+            existed.insert(sum);
+            int cur = sum;
+            
+            sum = 0;
+            while (cur) {
+                sum += (cur%10) * (cur%10);
+                cur /= 10;
+            }
+        }
+        
+        return (sum==1);
+    }
+};
+
+
+class Solution {
+public:
+    bool isHappy(int n) {
+        auto sumSquareDigits = [&](int m)->int{
+            int s = 0;
+            while(m){
+                s+=(m%10) * (m%10);
+                m/=10;
+            }
+            return s;
+        };
+        int slow = n;
+        int fast = sumSquareDigits(n);
+        while(slow>9 && fast>9 && slow!=fast){
+            slow = sumSquareDigits(slow);
+            fast = sumSquareDigits(sumSquareDigits(fast));
+        }
+        return (slow==1) || (fast==1) || (slow==7) || (fast==7);
+    }
+};
+
+// slower
+class Solution {
+public:
+    bool isHappy(int n) {
+        unordered_set<int> existed{1};
+        
+        int sum=n;
+        while (existed.find(sum) == existed.end()) {
+            existed.insert(sum);
+            
+            string ns = to_string(sum);
+            sum = 0;
+            for (auto c : ns) {
+                int cur = (int)(c-'0');
+                sum += cur * cur;
+            }
+        }
+        
+        return (sum==1);
+    }
+};

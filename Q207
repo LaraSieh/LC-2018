@@ -1,0 +1,87 @@
+207. Course Schedule
+DescriptionHintsSubmissionsDiscussSolution
+There are a total of n courses you have to take, labeled from 0 to n-1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?
+
+Example 1:
+
+Input: 2, [[1,0]] 
+Output: true
+Explanation: There are a total of 2 courses to take. 
+             To take course 1 you should have finished course 0. So it is possible.
+Example 2:
+
+Input: 2, [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+             To take course 1 you should have finished course 0, and to take course 0 you should
+             also have finished course 1. So it is impossible.
+Note:
+
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about how a graph is represented.
+You may assume that there are no duplicate edges in the input prerequisites.
+
+
+// dfs
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
+     //DFS 
+        vector<vector<int>> graph(numCourses, vector<int>(0));
+        vector<int> visited(numCourses, 0);
+        
+        for (auto &a : prerequisites) {
+            graph[a.first].push_back(a.second);
+        }
+        for (int i=0; i<numCourses; ++i) {
+            if (!dfs(graph, visited, i))
+                return false;
+        }
+        return true;
+    }
+    
+    bool dfs(vector<vector<int>>& graph, vector<int>& visited, int index) {
+        if (visited[index]==-1) return false; //there's a loop
+        if (visited[index]==1) return true;
+        visited[index]=-1;
+        for (auto & g : graph[index]) {
+            if (!dfs(graph, visited, g)) 
+                return false;
+        }
+        visited[index]=1;
+        return true;
+    }
+};
+
+// bfs
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
+     //BFS 
+        vector<vector<int> > graph(numCourses, vector<int>(0));
+        vector<int> dep(numCourses, 0);
+        //build graph
+        for (auto a : prerequisites) {
+            graph[a.first].push_back(a.second);
+            ++dep[a.second];
+        }
+        queue<int> q;
+        for (int i = 0; i < numCourses; ++i) {
+            if (dep[i] == 0) q.push(i);
+        }
+        while (!q.empty()) {
+            int t = q.front(); q.pop();
+            for (auto a : graph[t]) {
+                --dep[a];
+                if (dep[a] == 0) q.push(a);
+            }
+        }
+        for (int i = 0; i < numCourses; ++i) {
+            if (dep[i] != 0) return false;
+        }
+        return true;
+    }
+};

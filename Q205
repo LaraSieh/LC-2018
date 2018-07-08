@@ -1,0 +1,66 @@
+205. Isomorphic Strings
+DescriptionHintsSubmissionsDiscussSolution
+Given two strings s and t, determine if they are isomorphic.
+
+Two strings are isomorphic if the characters in s can be replaced to get t.
+
+All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character but a character may map to itself.
+
+Example 1:
+
+Input: s = "egg", t = "add"
+Output: true
+Example 2:
+
+Input: s = "foo", t = "bar"
+Output: false
+Example 3:
+
+Input: s = "paper", t = "title"
+Output: true
+Note:
+You may assume both s and t have the same length
+
+
+//S1 8ms
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        if (s.size() != t.size()) return false;
+        
+        unordered_map<char, char> stot, ttos;
+        for (int i=0; i<(int)s.size(); ++i) {
+            char sc = s[i], tc = t[i];
+            if (stot.find(sc) == stot.end() && ttos.find(tc) == ttos.end()) {
+                stot[sc] = tc;
+                ttos[tc] = sc;
+            } else { // at least one stot and ttos is not empty
+                if (stot.find(sc) == stot.end() || stot[sc] != tc 
+                   || ttos.find(tc) == ttos.end() || ttos[tc] != sc)
+                    return false;
+            }
+        }
+        return true;
+    }
+};
+
+// S2 4ms
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        if (s.size() != t.size()) return false;
+        
+        vector<char> stot(256, 0), ttos(256,0);
+        for (int i=0; i<(int)s.size(); ++i) {
+            char sc = s[i], tc = t[i];
+            if (stot[sc] == 0 && ttos[tc] ==0) {
+                stot[sc] = tc;
+                ttos[tc] = sc;
+            } else { // at least one stot and ttos is not empty
+                if (stot[sc] != tc || ttos[tc] != sc)
+                    return false;
+            }
+        }
+        return true;
+    }
+};

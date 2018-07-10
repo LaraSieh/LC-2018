@@ -58,5 +58,34 @@ public:
         visited[index]=1;
         return true;
     }
+};
+
+// better version
+class Solution {
+public:
+    // dfs as it is looking for one path
+    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
+        //build graph
+        for(const auto& p : prerequisites)
+            graph[p.second].push_back(p.first);
+        vector<State> v(numCourses, UNKNOWN);
+        vector<int> path; 
+        for(int i = 0; i < numCourses; ++i)
+            if(canFinish(i, v, path)==VISITING) return {};
+        return path;
+    }
+private:
+    enum State {UNKNOWN, VISITING, VISITED};
+    unordered_map<int,std::vector<int> > graph;
+    State canFinish(int index, vector<State>& v, std::vector<int>& path) {
+        if(v[index] ==UNKNOWN){
+            v[index] = VISITING;
+            for(const int t : graph[index])
+                if(canFinish(t, v, path)==VISITING) return VISITING;
+            v[index] = VISITED;
+            path.emplace(path.begin(), index);
+        } 
+        return v[index];
+    }
 
 };

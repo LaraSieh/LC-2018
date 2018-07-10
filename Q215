@@ -1,0 +1,82 @@
+215. Kth Largest Element in an Array
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+Example 1:
+
+Input: [3,2,1,5,6,4] and k = 2
+Output: 5
+Example 2:
+
+Input: [3,2,3,1,2,4,5,5,6] and k = 4
+Output: 4
+Note: 
+You may assume k is always valid, 1 ≤ k ≤ array's length.
+
+
+
+
+
+// straightforward sort
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        sort(nums.begin(), nums.end());
+        
+        return nums[nums.size()-k];
+    }
+};
+
+// nice way to use priority queue
+class Solution {
+public:
+    int findKthLargest(vector<int> &nums, int k)
+    {
+        auto comp = greater<int>();
+        priority_queue<int, vector<int>, decltype(comp)> pq(comp); // min queue
+        for (auto n : nums) {
+            pq.push(n);
+            if (pq.size() > k) {
+                pq.pop();
+            }
+        }
+        return pq.top();
+    }
+};
+
+// kth element algorithm
+class Solution {
+public:
+    int findKthLargest(vector<int> &nums, int k)
+    {
+        return kthElement(nums, 0, nums.size(), nums.size() - k);
+    }
+    
+    int kthElement(vector<int>& nums, int l, int r, int k) {
+        if (l == r)
+            return -1;
+
+        // random pivot
+        int pivot = l + rand() % (r - l);
+        swap(nums[r - 1], nums[pivot]);
+
+        pivot = r - 1;
+        int candidate = l;
+        // move small elements to front
+        for (int i = l; i < r - 1; i++) {
+            if (nums[i] <= nums[pivot]) {
+                swap(nums[i], nums[candidate]);
+                candidate++;
+            }
+        }
+
+        swap(nums[candidate], nums[pivot]);
+        pivot = candidate;
+
+        if (pivot == k)
+            return nums[pivot];
+        else if (pivot < k)
+            return kthElement(nums, pivot + 1, r, k);
+        else
+            return kthElement(nums, l, pivot, k);
+    }
+};

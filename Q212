@@ -1,0 +1,94 @@
+212. Word Search II
+Given a 2D board and a list of words from the dictionary, find all words in the board.
+
+Each word must be constructed from letters of sequentially adjacent cell, where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once in a word.
+
+Example:
+
+Input: 
+words = ["oath","pea","eat","rain"] and board =
+[
+  ['o','a','a','n'],
+  ['e','t','a','e'],
+  ['i','h','k','r'],
+  ['i','f','l','v']
+]
+
+Output: ["eat","oath"]
+Note:
+You may assume that all inputs are consist of lowercase letters a-z.
+
+class Solution {
+public:
+    struct TrieNode {
+        TrieNode *children[26];
+        bool     isWord;
+        string   word; 
+        TrieNode() : isWord(false) 
+        {
+            for (int i=0;i<26;++i) 
+                children[i]=NULL;
+        }
+    };
+    
+    struct Trie {
+        TrieNode *root;
+        Trie() {root = new TrieNode();}
+        void insert(string w) {
+            TrieNode *node=root;
+            for (char c : w) {
+                int i = (int)(c-'a');
+                if (!node->children[i]) {
+                    node->children[i] = new TrieNode();
+                }
+                node = node->children[i];
+            }
+            node->word = w;
+            node->isWord = true;
+        }
+    };
+    
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        int m=(int)board.size(), n=(int)board[0].size();
+        //build trie dictinary 
+        Trie dict;
+        for (auto &w : words)
+            dict.insert(w);
+        
+        vector<vector<bool>> visited(m,vector<bool>(n,false));
+        vector<string> list;
+        for (int i=0; i<m; ++i) {
+            for (int j=0; j<n; ++j) {
+                int index = (int)(board[i][j] - 'a');
+                dfs(board,i,j,dict.root->children[index],visited,list);            
+            }
+        }
+        return list;
+    }
+    
+    void dfs(vector<vector<char>>& board,int x,int y, 
+             TrieNode *node, vector<vector<bool>>& visited, vector<string>& list) {
+        if (!node) return;
+        
+        if (node->isWord && !node->word.empty()) {
+            list.push_back(node->word);
+            node->word.clear();
+        }
+        
+        int m=(int)board.size(), n=(int)board[0].size();
+        visited[x][y] = true;
+        for (auto &d : dir) {
+            int xnew = x + d.first;
+            int ynew = y + d.second;
+            if (xnew>=0&&xnew<m&&ynew>=0&&ynew<n&&!visited[xnew][ynew]&&node->children[(board[xnew][ynew]-'a')]) {
+                dfs(board,xnew,ynew,node->children[board[xnew][ynew]-'a'],visited,list);
+            }
+        }
+        visited[x][y] = false;
+        return;    
+    }
+
+private:    
+    Trie *dict;
+    vector<pair<int,int>> dir={{1,0},{-1,0},{0,1},{0,-1}};
+};

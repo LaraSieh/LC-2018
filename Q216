@@ -1,0 +1,68 @@
+216. Combination Sum III
+Find all possible combinations of k numbers that add up to a number n, given that only numbers from 1 to 9 can be used and each combination should be a unique set of numbers.
+
+Note:
+
+All numbers will be positive integers.
+The solution set must not contain duplicate combinations.
+Example 1:
+
+Input: k = 3, n = 7
+Output: [[1,2,4]]
+Example 2:
+
+Input: k = 3, n = 9
+Output: [[1,2,6], [1,3,5], [2,3,4]]
+
+
+class Solution {
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        vector<int>         oneset;
+        findCombinations(oneset,1,k,n);
+        return combinations;
+    }
+    
+    void findCombinations(vector<int>& oneset,int start,int k, int sum) {
+        if (k==0) {
+            if (sum == 0)
+                combinations.push_back(oneset);
+            return;
+        }
+        for (int i=start; i<=min(9,sum); ++i) {
+            oneset.push_back(i);
+            findCombinations(oneset, i+1, k-1, sum-i);
+            oneset.pop_back();
+        } 
+    }
+
+private:
+    vector<vector<int>> combinations;
+};
+
+
+
+// small modifications, hope to save a few cycles by return when either k or sum is 0 
+class Solution {
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        vector<int>         oneset;
+        findCombinations(oneset,1,k,n);
+        return combinations;
+    }
+    
+    void findCombinations(vector<int>& oneset,int start,int k, int sum) {
+        if (k == 0 || sum == 0) { 
+            if (sum==k) combinations.push_back(oneset); //sum==k means both are 0's
+            return;
+        }
+        for (int i=start; i<=min(9,sum); ++i) {
+            oneset.push_back(i);
+            findCombinations(oneset, i+1, k-1, sum-i);
+            oneset.pop_back();
+        } 
+    }
+
+private:
+    vector<vector<int>> combinations;
+};

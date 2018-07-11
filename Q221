@@ -1,0 +1,90 @@
+221. Maximal Square
+DescriptionHintsSubmissionsDiscussSolution
+Given a 2D binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
+
+Example:
+
+Input: 
+
+1 0 1 0 0
+1 0 1 1 1
+1 1 1 1 1
+1 0 0 1 0
+
+Output: 4
+
+
+class Solution {
+public:
+    int maximalSquare(vector<vector<char>>& matrix) {
+        if (!matrix.size() || !matrix[0].size()) return 0;
+        
+        int m=(int)matrix.size(), n=(int)matrix[0].size(); 
+        vector<vector<int>> sizeMatrix(m,vector<int>(n,0)); 
+        
+        int maxCount=0;
+        for (int i=0; i<m; ++i) {
+            if (matrix[i][0]=='1') {
+                sizeMatrix[i][0] = 1;
+                maxCount = 1;
+            }
+        }
+        for (int i=0; i<n; ++i) {
+            if (matrix[0][i]=='1') {
+                sizeMatrix[0][i] = 1;
+                maxCount = 1;
+            }
+        }
+        for (int i=1; i<m; ++i) {
+            for (int j=1; j<n; ++j) {
+                if (matrix[i][j] == '0')  continue;
+
+                //if (matrix[i][j]) == 1
+                
+                int count=sizeMatrix[i-1][j-1],h=0,v=0;
+                for (;h<=count&&matrix[i][j-h]=='1';++h);
+                for (;v<=count&&matrix[i-v][j]=='1';++v);
+                sizeMatrix[i][j] = min(h,v);
+                maxCount = max(sizeMatrix[i][j], maxCount);
+                
+            }
+        }
+        
+        return (maxCount*maxCount);
+    }
+};
+
+// a little clean up
+class Solution {
+public:
+    int maximalSquare(vector<vector<char>>& matrix) {
+        if (!matrix.size() || !matrix[0].size()) return 0;
+        
+        int m=(int)matrix.size(), n=(int)matrix[0].size(); 
+        vector<vector<int>> sizeMatrix(m,vector<int>(n,0)); 
+        
+        int maxCount=0;
+        for (int i=0; i<m; ++i) {
+            if (matrix[i][0]=='1') {
+                sizeMatrix[i][0] = 1;
+                maxCount = 1;
+            }
+        }
+        for (int i=0; i<n; ++i) {
+            if (matrix[0][i]=='1') {
+                sizeMatrix[0][i] = 1;
+                maxCount = 1;
+            }
+        }
+        for (int i=1; i<m; ++i) {
+            for (int j=1; j<n; ++j) {                
+                int count=sizeMatrix[i-1][j-1],h=0,v=0;
+                for (;h<=count&&matrix[i][j-h]=='1';++h);
+                for (;v<=count&&matrix[i-v][j]=='1';++v);
+                sizeMatrix[i][j] = min(h,v);
+                maxCount = max(sizeMatrix[i][j], maxCount);
+            }
+        }
+        return (maxCount*maxCount);
+    }
+};

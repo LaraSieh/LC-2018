@@ -1,0 +1,85 @@
+234. Palindrome Linked List
+Given a singly linked list, determine if it is a palindrome.
+
+Example 1:
+
+Input: 1->2
+Output: false
+Example 2:
+
+Input: 1->2->2->1
+Output: true
+Follow up:
+Could you do it in O(n) time and O(1) space?
+
+// O(n) time, O(n) space
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        vector<int> temp; 
+        int len = 0;
+        
+        while (head) {
+            temp.push_back(head->val);
+            ++len;
+            head = head->next;
+        }
+        
+        int l=0, r=len-1;
+        while (l<r) {
+            if (temp[l++]!=temp[r--])
+                return false;
+        }
+        
+        return true;
+    }
+};
+
+// O(n) time, O(1) space
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        if (!head || !head->next) return true;
+        
+        ListNode *first=head, *second=head;
+        while (second->next && second->next->next) {
+            first = first->next;
+            second = second->next->next;
+        }
+        //second points to the last one or second last
+        ListNode *last = first->next, *pre=head;
+        while (last->next) {
+            ListNode *n = last->next;
+            last->next = n->next;
+            n->next = first->next;
+            first->next = n;
+        }
+        first = first->next;
+        while (first) {
+            if (pre->val != first->val)
+                return false;
+            first = first->next;
+            pre = pre->next;
+        }
+        
+        return true;
+    }
+};
+
+// another recursive method
+class Solution {
+public:
+    ListNode *next;
+    
+    bool isPalindrome(ListNode* head) {
+        next = head;
+        return CompareRecursive(head);
+    }
+    
+    bool CompareRecursive(ListNode *node) {
+        if (!node) return true;
+        bool isPal = CompareRecursive(node->next) & (next->val==node->val);
+        next = next->next;
+        return isPal;
+    }
+};

@@ -1,0 +1,55 @@
+241. Different Ways to Add Parentheses
+Given a string of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. The valid operators are +, - and *.
+
+Example 1:
+
+Input: "2-1-1"
+Output: [0, 2]
+Explanation: 
+((2-1)-1) = 0 
+(2-(1-1)) = 2
+Example 2:
+
+Input: "2*3-4*5"
+Output: [-34, -14, -10, -10, 10]
+Explanation: 
+(2*(3-(4*5))) = -34 
+((2*3)-(4*5)) = -14 
+((2*(3-4))*5) = -10 
+(2*((3-4)*5)) = -10 
+(((2*3)-4)*5) = 10
+
+
+
+
+class Solution {
+public:
+    unordered_map<char, function<int (int, int)>> op = 
+    {
+        {'+', [](int a, int b) {return a+b;}},
+        {'-', [](int a, int b) {return a-b;}},
+        {'*', [](int a, int b) {return a*b;}}
+    };
+    
+    vector<int> diffWaysToCompute(string input) {
+       vector<int> results;
+        
+        for (int i=0; i<(int)input.size(); ++i) {
+            if (input[i]=='+' || input[i]=='-' || input[i]=='*') {
+                vector<int> left = diffWaysToCompute(input.substr(0,i));
+                vector<int> right = diffWaysToCompute(input.substr(i+1));
+                    
+                for (int l=0; l<(int)left.size(); ++l) {
+                    for (int r=0; r<(int)right.size(); ++r) {
+                        results.push_back(op[input[i]](left[l],right[r])); 
+                    }
+                }
+            }
+        }
+        
+        if (results.size() == 0)
+            results.push_back(atoi(input.c_str()));
+        
+        return results;
+    }
+};

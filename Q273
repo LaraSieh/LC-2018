@@ -1,0 +1,65 @@
+273. Integer to English Words
+
+Convert a non-negative integer to its english words representation. Given input is guaranteed to be less than 231 - 1.
+
+Example 1:
+
+Input: 123
+Output: "One Hundred Twenty Three"
+Example 2:
+
+Input: 12345
+Output: "Twelve Thousand Three Hundred Forty Five"
+Example 3:
+
+Input: 1234567
+Output: "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+Example 4:
+
+Input: 1234567891
+Output: "One Billion Two Hundred Thirty Four Million Five Hundred Sixty Seven Thousand Eight Hundred Ninety One"
+
+
+class Solution {
+public:
+    string numberToWords(int num) {
+        vector<string> units{""," Thousand"," Million"," Billion"};
+        int i = 0;
+        string words="";
+        while(num>0) {
+            if((num%1000)>0) words = convert(num%1000) + units[i] + (words.length()==0 ?"": " "+words);
+            num /= 1000;
+            i++;
+        }
+        return (words.size()==0) ? "Zero" : words;
+    }
+    
+    string convert(int num){
+        string word = "";
+        vector<string> ten{"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+        vector<string> hundred{"Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+        vector<string> twenty{"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+        if(num>0) {
+            int temp = num/100;
+            if(temp>0) {
+                word += ten[temp] + " Hundred";
+            }
+            temp = num%100;
+            if(temp>=10 && temp<20){
+                if(!word.size()==0) word +=" ";
+                word += twenty[temp%10];
+                return word;
+            }else if(temp>=20){
+                temp = temp/10;
+                if(!word.size()==0) word +=" ";
+                word += hundred[temp-1];
+            }
+            temp = num%10;
+            if(temp>0) {
+                if(!word.size()==0) word +=" ";
+                word += ten[temp];
+            }
+        }
+        return word;
+    }
+};

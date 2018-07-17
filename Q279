@@ -13,7 +13,19 @@ Input: n = 13
 Output: 2
 Explanation: 13 = 4 + 9.
 
-
+class Solution {
+public:
+    int numSquares(int n) {
+        vector<int> dp(n + 1, INT_MAX);
+        dp[0] = 0;
+        for (int i = 0; i <= n; ++i) {
+            for (int j = 1; i + j * j <= n; ++j) {
+                dp[i + j * j] = min(dp[i + j * j], dp[i] + 1);
+            }
+        }
+        return dp.back();
+    }
+};
 
 //四平方和定理
 //任意一个正整数均可表示为4个整数的平方和，其实是可以表示为4个以内的平方数之和，那么就是说返回结果只有1,2,3或4其中的一个

@@ -1,0 +1,92 @@
+282. Expression Add Operators
+Given a string that contains only digits 0-9 and a target value, return all possibilities to add binary operators (not unary) +, -, or * between the digits so they evaluate to the target value.
+
+Example 1:
+
+Input: num = "123", target = 6
+Output: ["1+2+3", "1*2*3"] 
+Example 2:
+
+Input: num = "232", target = 8
+Output: ["2*3+2", "2+3*2"]
+Example 3:
+
+Input: num = "105", target = 5
+Output: ["1*0+5","10-5"]
+Example 4:
+
+Input: num = "00", target = 0
+Output: ["0+0", "0-0", "0*0"]
+Example 5:
+
+Input: num = "3456237490", target = 9191
+Output: []
+
+
+
+class Solution {
+public:
+    vector<string> addOperators(string num, int target) {
+        vector<string>  formula;
+        
+        dfs(num,target,0,0,"",formula);
+        return formula;
+    }
+    
+    void dfs(string num, int target, long long diff, long long cur, string out, vector<string>& formula) 
+    {
+        if (num.size()==0 && cur == target) {
+            formula.push_back(out);
+        }
+        for (int i=1; i<=(int)num.size(); ++i) {
+            string tmp = num.substr(0,i);
+            if (tmp.size()>1 && tmp[0]=='0')
+                return;
+            string next = num.substr(i);
+            if (out.size()>0) {
+                dfs(next,target, stoll(tmp),cur+stoll(tmp),out+"+"+tmp,formula);
+                dfs(next,target,-stoll(tmp),cur-stoll(tmp),out+"-"+tmp,formula);
+                dfs(next,target,diff*stoll(tmp),(cur-diff)+diff*stoll(tmp),out+"*"+tmp,formula);
+            } else {
+                dfs(next,target,stoll(tmp),stoll(tmp),tmp,formula);
+            }
+        }
+    }
+};
+
+
+
+class Solution {
+public:
+    vector<string> res;
+    string exp;
+    int len;
+    void dfs(int id, int t, int pre, string& s, int pos) {
+        if (id == len && t == 0) {
+            res.push_back(exp.substr(0, pos));
+            return;
+        }
+        long long v = 0;
+        int npos = id == 0 ? 0 : pos + 1;
+        for (int i = id; i < len; i++) {
+            v = 10 * v + s[i] - '0'; 
+            if (v > INT_MAX) break;
+            exp[npos++] = s[i];
+            if (id == 0) {
+                dfs(i + 1, t - v, v, s, pos + (i - id + 1));
+            } else {
+                exp[pos] = '+'; dfs(i + 1, t - v, v, s, pos + 1 + (i - id + 1));
+                exp[pos] = '-'; dfs(i + 1, t + v, -v, s, pos + 1 + (i - id + 1));
+                exp[pos] = '*'; dfs(i + 1, t + pre - pre * v, pre * v, s, pos + 1 + (i - id + 1));
+            }
+            if (v == 0) break;
+        }
+    }
+    
+    vector<string> addOperators(string num, int target) {
+        len = num.length();
+        exp.resize(2 * len);
+        dfs(0, target, 0, num, 0);
+        return res;
+    }
+};

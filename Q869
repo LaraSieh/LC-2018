@@ -1,0 +1,76 @@
+869. Reordered Power of 2
+Starting with a positive integer N, we reorder the digits in any order (including the original order) such that the leading digit is not zero.
+
+Return true if and only if we can do this in a way such that the resulting number is a power of 2.
+
+ 
+
+Example 1:
+
+Input: 1
+Output: true
+Example 2:
+
+Input: 10
+Output: false
+Example 3:
+
+Input: 16
+Output: true
+Example 4:
+
+Input: 24
+Output: false
+Example 5:
+
+Input: 46
+Output: true
+ 
+
+Note:
+
+1 <= N <= 10^9
+
+
+// solution 1
+class Solution {
+public:
+    bool reorderedPowerOf2(int N) {
+        vector<int> powerOfTwo={1};
+        
+        // build up power of 2 table
+        int po2=2;
+        while (po2<1000000000) {
+            powerOfTwo.push_back(po2);
+            po2 *= 2;
+        }
+                
+        for (int i=0; i<(int)powerOfTwo.size(); ++i) {
+            if (permutable(powerOfTwo[i],N))
+                return true;
+        }
+        return false;
+    }
+    
+    bool permutable(int a, int b) {
+        vector<int> digits(10,0);
+        
+        while (a) {
+            ++digits[a%10];
+            a /= 10;
+        }
+        while (b) {
+            if (digits[b%10]<=0)
+                return false;
+            --digits[b%10];
+            b /= 10;
+        }
+        
+        for (int i=0; i<10; ++i)
+            if (digits[i] != 0)
+                return false;
+        
+        return true;
+    }
+};
+

@@ -1,0 +1,139 @@
+863. All Nodes Distance K in Binary Tree
+We are given a binary tree (with root node root), a target node, and an integer value K.
+
+Return a list of the values of all nodes that have a distance K from the target node.  The answer can be returned in any order.
+
+ 
+
+Example 1:
+
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, K = 2
+
+Output: [7,4,1]
+
+Explanation: 
+The nodes that are a distance 2 from the target node (with value 5)
+have values 7, 4, and 1.
+
+
+
+Note that the inputs "root" and "target" are actually TreeNodes.
+The descriptions of the inputs above are just serializations of these objects.
+ 
+
+Note:
+
+The given tree is non-empty.
+Each node in the tree has unique values 0 <= node.val <= 500.
+The target node is a node in the tree.
+0 <= K <= 1000.
+
+
+
+
+
+//s1
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> distanceK(TreeNode* root, TreeNode* target, int K) {
+        vector<TreeNode *> rootToTarget;
+        buildToTargetPath(root, target, rootToTarget);
+        //assert(rootToTarget.back() != target);
+//        for (auto& r : rootToTarget) {
+//            cout << r->val << "  ";
+//        }
+//        cout << endl;
+        
+        vector<int> kToTarget;
+        int parent = (int)rootToTarget.size();
+        for (int i=0; i<min(K+1,parent);++i) {
+            TreeNode *inPath = NULL;
+            if (i>0)
+                inPath = rootToTarget[parent-i];
+            findKthNode(rootToTarget[parent-i-1],inPath, K-i,kToTarget);
+        }
+        
+        return kToTarget;
+    }
+    
+    bool buildToTargetPath(TreeNode *node, TreeNode *target, vector<TreeNode *>& path) {
+        path.push_back(node);
+        if (node->val == target->val) {
+            return true;
+        }
+        if (node->left && buildToTargetPath(node->left,target,path))
+            return true;
+        if (node->right && buildToTargetPath(node->right,target,path))
+            return true;
+        path.pop_back();
+        return false;    
+    }
+    
+    void findKthNode(TreeNode *node, TreeNode *inPath, int d, vector<int>& kToTarget) {
+//        cout << node->val << "  " << d << "  " << kToTarget.size() <<endl;
+        if (d==0 && node) {
+            kToTarget.push_back(node->val);
+            return;    
+        } 
+        if (d<0)
+            return;
+        if (node->left && node->left != inPath) 
+            findKthNode(node->left, NULL, d-1, kToTarget);
+        if (node->right && node->right != inPath)
+            findKthNode(node->right,NULL, d-1, kToTarget);
+    }
+};
+
+
+// s2
+class Solution {
+public:
+    vector<int> distanceK(TreeNode* root, TreeNode* target, int K) {
+        vector<int> kTh;
+        unordered_map<TreeNode *,int> distance;
+        dfs_distance(root,target,distance);
+        for (auto& d : distance) {
+            if (d.second == K)
+                kTh.push_back(d.first->val);
+        }
+        return kTh;        
+    }
+    
+    int dfs_distance(TreeNode *node, TreeNode *target, unordered_map<TreeNode *,int>& distance) {
+        if (!node) return -1;
+        
+        if (node->val == target->val) {
+            cal_distance(node,0,distance);
+            return 0;
+        }
+        int left = dfs_distance(node->left,target,distance);
+        int right = dfs_distance(node->right,target,distance);
+        if (left>=0) {
+            distance[node]=left+1;
+            cal_distance(node->right,left+2,distance);
+            return left+1;
+        }
+        if (right>=0) {
+            distance[node] = right+1;
+            cal_distance(node->left,right+2,distance);
+            return right+1;
+        }
+        return -1;
+    }
+    
+    void cal_distance(TreeNode *node, int d, unordered_map<TreeNode *,int>& distance) {
+        if (!node) return;
+        distance[node] = d;
+        cal_distance(node->left,d+1,distance);
+        cal_distance(node->right,d+1,distance);
+    }
+};

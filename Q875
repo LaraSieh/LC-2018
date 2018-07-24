@@ -1,0 +1,143 @@
+875. Koko Eating Bananas
+Koko loves to eat bananas.  There are N piles of bananas, the i-th pile has piles[i] bananas.  The guards have gone and will come back in H hours.
+
+Koko can decide her bananas-per-hour eating speed of K.  Each hour, she chooses some pile of bananas, and eats K bananas from that pile.  If the pile has less than K bananas, she eats all of them instead, and won't eat any more bananas during this hour.
+
+Koko likes to eat slowly, but still wants to finish eating all the bananas before the guards come back.
+
+Return the minimum integer K such that she can eat all the bananas within H hours.
+
+ 
+
+Example 1:
+
+Input: piles = [3,6,7,11], H = 8
+Output: 4
+Example 2:
+
+Input: piles = [30,11,23,4,20], H = 5
+Output: 30
+Example 3:
+
+Input: piles = [30,11,23,4,20], H = 6
+Output: 23
+ 
+
+Note:
+
+1 <= piles.length <= 10^4
+piles.length <= H <= 10^9
+1 <= piles[i] <= 10^9
+
+
+//TLE
+class Solution {
+public:
+    int minEatingSpeed(vector<int>& piles, int H) {
+        sort(piles.begin(),piles.end());
+        int lo=1, hi=piles.back();
+        
+        while (lo<hi) {            
+            // total is the time to finish eating all banana
+            long long total = calculateTotalTimes(piles,lo); 
+//              cout << lo << " " << hi << " " << total << endl;
+                
+            if (total<=(long long)H)
+                return lo;
+            
+            ++lo;
+        }
+        
+        return hi;    
+    }
+    
+    long long calculateTotalTimes(vector<int>& piles, int k) {
+        long long total=0;
+        for (int i=0; i<(int)piles.size(); ++i) {
+            total += (piles[i]/k) + ((piles[i]%k) == 0 ? 0 : 1);
+        }
+        return total;
+    }
+};
+
+
+
+//S2
+class Solution {
+public:
+    int minEatingSpeed(vector<int>& piles, int H) {
+        int lo=1, hi=1e9;
+        
+        while (lo<=hi) {
+            int mid = lo + (hi-lo)/2;
+            // total is the time to finish eating all banana
+            long long total = calculateTotalTimes(piles,mid); 
+//            cout << lo << " " << hi << " " << total << endl;  
+            if (total<=(long long)H) { //k is in [lo,mid)
+                hi = mid-1;
+            } else { // total > H, meaning K is in [mid+1,hi]
+                lo = mid + 1;
+            }
+        }
+        
+        return lo;    
+    }
+    
+    long long calculateTotalTimes(vector<int>& piles, int k) {
+        long long total=0;
+        for (int i=0; i<(int)piles.size(); ++i) {
+            total += (piles[i]/k) + ((piles[i]%k) == 0 ? 0 : 1);
+        }
+        return total;
+    }
+};
+
+
+//S3
+class Solution {
+public:
+    int minEatingSpeed(vector<int>& piles, int H) {
+        int lo=1, hi=1e9;
+        
+        while (lo<hi) {
+            int mid = lo + (hi-lo)/2;
+            // total is the time to finish eating all banana
+            int total = 0;
+            for (int p : piles) {
+                total += (p+mid-1)/mid;
+            }
+            
+            if (total<=H) { //k is in [lo,mid]
+                hi = mid;
+            } else { // total > H, meaning K is in [mid+1,hi]
+                lo = mid+1;
+            }
+        }
+        
+        return lo;    
+    }
+
+// S4
+class Solution {
+public:
+    int minEatingSpeed(vector<int>& piles, int H) {
+        int lo=1, hi=1e9;
+        
+        while (lo<hi) {
+            int mid = lo + (hi-lo)/2;
+            // total is the time to finish eating all banana
+            int total = 0;
+            for (int p : piles) {
+                total += (p+mid-1)/mid;
+            }
+
+            if (total<=H) { //k is in [lo,mid]
+                hi = mid;
+            } else { // total > H, meaning K is in [mid+1,hi]
+                lo = mid+1;
+            }
+        }
+        
+        return lo;    
+    }
+};

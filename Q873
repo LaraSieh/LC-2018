@@ -1,0 +1,110 @@
+873. Length of Longest Fibonacci Subsequence
+A sequence X_1, X_2, ..., X_n is fibonacci-like if:
+
+n >= 3
+X_i + X_{i+1} = X_{i+2} for all i + 2 <= n
+Given a strictly increasing array A of positive integers forming a sequence, find the length of the longest fibonacci-like subsequence of A.  If one does not exist, return 0.
+
+(Recall that a subsequence is derived from another sequence A by deleting any number of elements (including none) from A, without changing the order of the remaining elements.  For example, [3, 5, 8] is a subsequence of [3, 4, 5, 6, 7, 8].)
+
+ 
+
+Example 1:
+
+Input: [1,2,3,4,5,6,7,8]
+Output: 5
+Explanation:
+The longest subsequence that is fibonacci-like: [1,2,3,5,8].
+Example 2:
+
+Input: [1,3,7,11,12,14,18]
+Output: 3
+Explanation:
+The longest subsequence that is fibonacci-like:
+[1,11,12], [3,11,14] or [7,11,18].
+ 
+
+Note:
+
+3 <= A.length <= 1000
+1 <= A[0] < A[1] < ... < A[A.length - 1] <= 10^9
+(The time limit has been reduced by 50% for submissions in Java, C, and C++.)
+
+
+// 144ms
+class Solution {
+public:    
+    int lenLongestFibSubseq(vector<int>& A) {
+        int n=(int)A.size();
+        unordered_map<int,int> n2i;
+        map<pair<int,int>,int> p2c;
+        
+        for (int i=0; i<n; ++i) {
+            n2i[A[i]] = i;
+        }
+        
+        int maxSeq=0;
+        for (int i=n-3; i>=0; --i) {
+            for (int j=i+1; j<n-1;++j) {
+                int sum=A[i]+A[j];
+                if (n2i.count(sum)) {
+                    p2c[make_pair(i,j)]=p2c[make_pair(j,n2i[sum])]+1;
+                    maxSeq = max(maxSeq,p2c[make_pair(i,j)]);       
+                }
+            }
+        }
+        
+        return (maxSeq==0 ? 0 :  maxSeq+2);
+    }
+};
+
+// 32ms
+class Solution {
+public:    
+    int lenLongestFibSubseq(vector<int>& A) {
+        int n=(int)A.size();
+        map<pair<int,int>,int> p2c;
+                
+        int maxSeq = 0;
+        for(int i = 2; i < n; i++){
+            int lo = 0, hi = i-1;
+            while(lo < hi){
+                if(A[lo] + A[hi] < A[i]){
+                    lo++;continue;
+                }
+                else if(A[lo] + A[hi] > A[i]){
+                    hi--; continue;
+                }
+                p2c[make_pair(hi,i)] = p2c[make_pair(lo,hi)] + 1;
+                maxSeq = max(maxSeq, p2c[make_pair(hi,i)]);
+                lo++;
+            }
+        }
+        return (maxSeq > 0 ? maxSeq+2 : 0);
+    }
+};
+
+// 28ms
+class Solution {
+public:    
+    int lenLongestFibSubseq(vector<int>& A) {
+        map<int, int> dp;
+        int n = A.size();
+        int mlen = 0;
+        for(int i = 2; i < n; i++){
+            int j = 0, k = i-1;
+            while(j < k){
+                if(A[j] + A[k] < A[i]){
+                    j++;continue;
+                }
+                else if(A[j] + A[k] > A[i]){
+                    k--; continue;
+                }
+                dp[k*n+i] = dp[j*n+k] + 1;
+                if(dp[k*n+i]+2 > mlen) mlen = dp[k*n+i]+2;
+                j++;
+            }
+        }
+        return (mlen >= 3? mlen:0);
+    }
+};

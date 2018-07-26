@@ -75,4 +75,17 @@ public:
     }
 };
 
-
+// O(n) O(1) yet not modify the original string
+class Solution {
+public:
+    bool backspaceCompare(string S, string T) {
+        for (int i = S.length() - 1, j = T.length() - 1;;i--, j--) {
+            for (int b = 0; i >= 0 && (b || S[i] == '#'); --i) 
+                b +=  S[i] == '#' ? 1 : -1;
+            for (int b = 0; j >= 0 && (b || T[j] == '#'); --j) 
+                b +=  T[j] == '#' ? 1 : -1;
+            if (i < 0 || j < 0 || S[i] != T[j]) 
+                return i == -1 && j == -1;
+        }
+    }
+};

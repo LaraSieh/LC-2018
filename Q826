@@ -1,0 +1,131 @@
+826. Most Profit Assigning Work
+We have jobs: difficulty[i] is the difficulty of the ith job, and profit[i] is the profit of the ith job. 
+
+Now we have some workers. worker[i] is the ability of the ith worker, which means that this worker can only complete a job with difficulty at most worker[i]. 
+
+Every worker can be assigned at most one job, but one job can be completed multiple times.
+
+For example, if 3 people attempt the same job that pays $1, then the total profit will be $3.  If a worker cannot complete any job, his profit is $0.
+
+What is the most profit we can make?
+
+Example 1:
+
+Input: difficulty = [2,4,6,8,10], profit = [10,20,30,40,50], worker = [4,5,6,7]
+Output: 100 
+Explanation: Workers are assigned jobs of difficulty [4,4,6,6] and they get profit of [20,20,30,30] seperately.
+Notes:
+
+1 <= difficulty.length = profit.length <= 10000
+1 <= worker.length <= 10000
+difficulty[i], profit[i], worker[i]  are in range [1, 10^5]
+
+
+//straight forward
+class Solution {
+public:
+    int maxProfitAssignment(vector<int>& difficulty, vector<int>& profit, vector<int>& worker) {
+        int n=(int)difficulty.size();
+        
+        vector<pair<int,int>> d2p;
+        for (int i=0; i<n; ++i) {
+            d2p.push_back(make_pair(difficulty[i],profit[i]));
+        }
+        sort(d2p.begin(), d2p.end());
+
+        //now difficulty is in order
+        int mostProfit=0;
+        for (int i=0; i<n; ++i) {
+            mostProfit = max(d2p[i].second,mostProfit);
+            d2p[i].second = mostProfit;
+        }
+ /*       
+                for (int i=0;i<n;++i) {
+            cout << d2p[i].first << "  ";
+        }
+        cout << endl;
+        
+        for (int i=0;i<n;++i) {
+            cout << d2p[i].second << "  ";
+        }
+        cout << endl;
+   */     
+        
+        sort(worker.begin(), worker.end());
+        int work=0, d=0, maxProfit=0;
+        while (worker[work]<d2p[0].first) {
+            ++work;
+        }
+
+        while (work<(int)worker.size()) {
+            while(d<n&&d2p[d].first<=worker[work]) {
+                ++d;
+            } 
+            maxProfit += d2p[d-1].second;
+            ++work;
+        }
+        return maxProfit;
+    }
+};
+
+//improved
+class Solution {
+public:
+    int maxProfitAssignment(vector<int>& difficulty, vector<int>& profit, vector<int>& worker) {
+        int n=(int)difficulty.size();
+        
+        vector<pair<int,int>> d2pOrig,d2p;
+        for (int i=0; i<n; ++i) {
+            d2pOrig.push_back(make_pair(difficulty[i],profit[i]));
+        }
+        sort(d2pOrig.begin(), d2pOrig.end());
+        
+        //now difficulty is in order
+        int mostProfit=0;
+        for (int i=0; i<n; ++i) {
+            if (mostProfit<d2pOrig[i].second) {
+                mostProfit = d2pOrig[i].second;
+                d2p.push_back(d2pOrig[i]);
+            }
+        }
+        
+        if (d2p.size()==0) return 0;
+        
+        d2pOrig.clear();        
+        sort(worker.begin(), worker.end());
+        int work=0, d=0, maxProfit=0;
+        
+        while (worker[work]<d2p[0].first) {
+            ++work;
+        }
+        while (work<(int)worker.size()) {
+            while(d<d2p.size()&&d2p[d].first<=worker[work]) {
+                ++d;
+            } 
+            maxProfit += d2p[d-1].second;
+            ++work;
+        }
+        return maxProfit;
+    }
+};
+
+//not the fastest, but cleanest
+class Solution {
+public:
+    int maxProfitAssignment(vector<int>& difficulty, vector<int>& profit, vector<int>& worker) {
+       vector<pair<int,int>> d2p;
+        int n = profit.size(), maxProfit = 0, i = 0, maxp = 0;
+        for (int j = 0; j < n; ++j) 
+            d2p.push_back(make_pair(difficulty[j], profit[j]));
+        sort(d2p.begin(), d2p.end()); 
+        sort(worker.begin(), worker.end());
+        for (int & w: worker) {
+            while (i < n && w >= d2p[i].first) 
+                maxp = max(d2p[i++].second, maxp);
+            maxProfit += maxp;
+        }
+        return maxProfit;
+    }
+};
+
+// binary search? 

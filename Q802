@@ -1,0 +1,130 @@
+802. Find Eventual Safe States
+In a directed graph, we start at some node and every turn, walk along a directed edge of the graph.  If we reach a node that is terminal (that is, it has no outgoing directed edges), we stop.
+
+Now, say our starting node is eventually safe if and only if we must eventually walk to a terminal node.  More specifically, there exists a natural number K so that for any choice of where to walk, we must have stopped at a terminal node in less than K steps.
+
+Which nodes are eventually safe?  Return them as an array in sorted order.
+
+The directed graph has N nodes with labels 0, 1, ..., N-1, where N is the length of graph.  The graph is given in the following form: graph[i] is a list of labels j such that (i, j) is a directed edge of the graph.
+
+Example:
+Input: graph = [[1,2],[2,3],[5],[0],[5],[],[]]
+Output: [2,4,5,6]
+Here is a diagram of the above graph.
+
+Illustration of graph
+
+Note:
+
+graph will have length at most 10000.
+The number of edges in the graph will not exceed 32000.
+Each graph[i] will be a sorted list of different integers, chosen within the range [0, graph.length - 1].
+
+
+//TLE
+class Solution {
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        int n=(int)graph.size();
+        unordered_map<int,set<int>> gset; // i->set
+        unordered_map<int, set<int>> rgset; // i<-set of nodes
+        set<int>  emptyset;
+        vector<int>  safeNodes;
+        
+        for (int i=0; i<n; ++i) {
+            for (int j=0; j<(int)graph[i].size(); ++j) {
+                gset[i].insert(graph[i][j]);
+                rgset[graph[i][j]].insert(i);
+            }
+            if (gset[i].empty()) 
+                emptyset.insert(i);
+        }
+        
+        while (!emptyset.empty()) {
+            for (int e : emptyset) {
+                safeNodes.push_back(e);
+                emptyset.erase(e);
+                for (auto g : rgset[e]) {
+                    gset[g].erase(e);
+                }
+                gset.erase(e);
+            }
+        
+            for (auto g=gset.begin(); g != gset.end(); ++g)
+                if (g->second.empty())
+                    emptyset.insert(g->first);
+                        
+        }
+        
+        sort(safeNodes.begin(), safeNodes.end());
+        return safeNodes;
+    }
+};
+
+
+//copied from discussion
+class Solution {
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        int n=(int)graph.size();
+        vector<bool> inloop(n,false);
+        vector<bool> noloop(n,false);
+        vector<int>  safeNodes;
+        vector<bool> visited(n,false);
+        
+        for (int i=0; i<n; ++i) {
+            if (dfs(graph,i,inloop,noloop,visited))
+                safeNodes.push_back(i);
+        }
+        return safeNodes;
+    }
+    
+    bool dfs(vector<vector<int>>& graph, int index, vector<bool>& inloop, vector<bool>& noloop, vector<bool>& visited) {
+        if (visited[index] || inloop[index]) 
+            return false;
+        if (noloop[index])
+            return true;
+        
+        visited[index]=true;
+        bool safe=true;
+        for (int l : graph[index])
+            safe &= dfs(graph,l,inloop,noloop,visited);
+        visited[index]=false;
+        
+        if (safe) 
+            noloop[index] = true;
+        else 
+            inloop[index] = true;
+        
+        return safe;        
+    }
+};
+
+// solution, simpler
+class Solution {
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        int n=(int)graph.size();
+        vector<int> dp(n,0);
+        vector<int> safeNodes;
+        
+        for (int i=0; i<n; ++i) {
+            if (dfs(graph,i,dp))
+                safeNodes.push_back(i);
+        }
+        
+        return safeNodes;
+    }
+    
+    bool dfs(const vector<vector<int>>& graph, int index, vector<int>& dp) {
+        if (dp[index]==1) return true;
+        if (dp[index]==-1) return false;
+        dp[index]=-1;
+        for (int g : graph[index]) {
+            if (dfs(graph,g,dp)==false)
+                return false;
+        }
+        dp[index]=1;
+        return true;
+    }
+};

@@ -35,3 +35,39 @@ public:
         return (find(A, target-A[i], k-1, index+1) || find(A,target,k,index+1));
     }
 };
+
+// DP, copied from discussion
+class Solution {
+public:
+    bool splitArraySameAverage(vector<int>& A) {
+        int n=(int)A.size(), total=accumulate(A.begin(),A.end(),0);
+        
+        for (int i=1; i<=n/2;++i) {
+            if (((total*i % n) == 0) && canSplit(A,n,i,total*i/n))
+                return true;
+        }
+        return false;
+    }
+    
+    bool canSplit(vector<int>& A, int n, int k, int target) {
+        if (k==0) 
+            return (target==0);
+        if (target<=0)
+            return false;
+        if (k == 0 || n == 0) {
+            return false;
+        }
+
+        
+        if (dp.find(n)!=dp.end() && dp[n].find(k)!=dp[n].end() && dp[n][k].find(target)!=dp[n][k].end()) {
+            return dp[n][k][target];
+        } 
+ 
+        dp[n][k][target] = canSplit(A,n-1,k,target) | canSplit(A,n-1,k-1,target-A[n-1]);;
+        
+        return dp[n][k][target];
+    }
+    
+private:
+    unordered_map<int, unordered_map<int, unordered_map<int, bool>>> dp;    
+};

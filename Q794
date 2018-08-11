@@ -68,6 +68,12 @@ public:
                 ++winO;
         }
         
+       // State is not valid if;
+      // 1. Both x and o have wins
+      // 2. X wins but has the same count as O (since the game would have ended and O never played)
+      // 3. O wins but does not have the same count as X, as X would not have played again
+      //return !((x_win && (o_win || num_x == num_o)) || (o_win && num_x != num_o));
+        
         if (nX<nO || (nX-nO)>1) return false;
         if (winX&&winO) return false;
         if ((winX&& (nX==nO) || (winO && (nX>nO)))) return false;

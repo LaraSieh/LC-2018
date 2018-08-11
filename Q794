@@ -1,0 +1,77 @@
+794. Valid Tic-Tac-Toe State
+A Tic-Tac-Toe board is given as a string array board. Return True if and only if it is possible to reach this board position during the course of a valid tic-tac-toe game.
+
+The board is a 3 x 3 array, and consists of characters " ", "X", and "O".  The " " character represents an empty square.
+
+Here are the rules of Tic-Tac-Toe:
+
+Players take turns placing characters into empty squares (" ").
+The first player always places "X" characters, while the second player always places "O" characters.
+"X" and "O" characters are always placed into empty squares, never filled ones.
+The game ends when there are 3 of the same (non-empty) character filling any row, column, or diagonal.
+The game also ends if all squares are non-empty.
+No more moves can be played if the game is over.
+Example 1:
+Input: board = ["O  ", "   ", "   "]
+Output: false
+Explanation: The first player always plays "X".
+
+Example 2:
+Input: board = ["XOX", " X ", "   "]
+Output: false
+Explanation: Players take turns making moves.
+
+Example 3:
+Input: board = ["XXX", "   ", "OOO"]
+Output: false
+
+Example 4:
+Input: board = ["XOX", "O O", "XOX"]
+Output: true
+Note:
+
+board is a length-3 array of strings, where each string board[i] has length 3.
+Each board[i][j] is a character in the set {" ", "X", "O"}.
+
+
+class Solution {
+public:
+    bool validTicTacToe(vector<string>& board) {
+        int n=(int)board.size();  //n==3
+        
+        int nX=0, nO=0, winX=0, winO=0;
+        vector<bool> same(n+2,true);
+        for (int i=0; i<n; ++i) {
+            if (board[i]=="XXX")
+                ++winX;
+            if (board[i]=="OOO") 
+                ++winO;
+                
+            for (int j=0; j<n;++j) {
+                if (board[i][j]=='X')
+                    ++nX;
+                else if (board[i][j]=='O')
+                    ++nO;
+                
+                if (board[i][j] != board[0][j]) same[j] = false;
+            }
+        
+            if (board[i][i] != board[0][0]) same[n] = false;
+            if (board[i][n-1-i] != board[0][n-1]) same[n+1] = false;
+        }
+        
+        for (int i=0; i<n+2; ++i) {
+            if (same[i]==false) continue;
+            if ((i<n&&board[0][i] =='X') || (i==n&&board[0][0]=='X') || (i==n+1&&board[0][n-1]=='X'))
+                ++winX;
+            else if ((i<n&&board[0][i] =='O') || (i==n&&board[0][0]=='O') || (i==n+1&&board[0][n-1]=='O'))
+                ++winO;
+        }
+        
+        if (nX<nO || (nX-nO)>1) return false;
+        if (winX&&winO) return false;
+        if ((winX&& (nX==nO) || (winO && (nX>nO)))) return false;
+        
+        return true;
+    }
+};

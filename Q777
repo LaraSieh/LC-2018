@@ -1,0 +1,86 @@
+777. Swap Adjacent in LR String
+DescriptionHintsSubmissionsDiscussSolution
+In a string composed of 'L', 'R', and 'X' characters, like "RXXLRXRXL", a move consists of either replacing one occurrence of "XL" with "LX", or replacing one occurrence of "RX" with "XR". Given the starting string start and the ending string end, return True if and only if there exists a sequence of moves to transform one string to the other.
+
+Example:
+
+Input: start = "RXXLRXRXL", end = "XRLXXRRLX"
+Output: True
+Explanation:
+We can transform start to end following these steps:
+RXXLRXRXL ->
+XRXLRXRXL ->
+XRLXRXRXL ->
+XRLXXRRXL ->
+XRLXXRRLX
+Note:
+
+1 <= len(start) = len(end) <= 10000.
+Both start and end will only consist of characters in {'L', 'R', 'X'}.
+
+
+//
+class Solution {
+public:
+    bool canTransform(string start, string end) {
+        if (start.size() != end.size()) return false;
+        
+        int n=(int)start.size(),i=0,j=0;
+        // note: only start string can be changed, end string can not be changed
+        while(i<n&&j<n) {
+            while (i<n&&start[i]=='X') ++i;
+            while (j<n&&end[j]=='X') ++j;
+            
+            if (start[i]!=end[j])
+                return false;
+            if (start[i]=='L' && i<j) 
+                return false;
+            else if (start[i]=='R' && i>j) 
+                return false;
+            
+            ++i,++j;
+        }   
+        return true;
+    }
+};
+
+// similar, copied from discussion
+class Solution {
+public:
+    bool canTransform(string start, string end) {
+        for (int i = 0, j = 0; i < start.size(), j < end.size();) {
+            if (start[i] == 'X') i++;
+            if (end[j] == 'X') j++;
+            
+            if (start[i] != 'X' && end[j] != 'X') {
+                if (start[i] != end[j]) return false;
+                else if (start[i] == 'L' && j > i) return false;
+                else if (start[i] == 'R' && j < i) return false;
+                else i++, j++;
+            }
+        }
+        return true;
+    }
+};
+
+
+// this solution is based on both start and end can swap
+class Solution {
+public:
+    bool canTransform(string start, string end) {
+        if (start.size() != end.size()) return false;
+        if (start == end) return true;
+        
+        int n=(int)start.size();
+        for (int i=0; i<n; ++i) {
+            if (start[i] != end[i]) {
+                if (start[i] != 'X'&&end[i] != 'X') return false;
+                int j=i+1;
+                while (j<n&&start[j]=='X'&&end[j]=='X') ++j;
+                if (start[i]!=end[j] || start[j]!=end[i]) return false;
+                i=j;
+            }
+        }
+        return true;
+    }
+};

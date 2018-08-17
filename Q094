@@ -1,0 +1,126 @@
+94. Binary Tree Inorder Traversal
+DescriptionHintsSubmissionsDiscussSolution
+Given a binary tree, return the inorder traversal of its nodes' values.
+
+Example:
+
+Input: [1,null,2,3]
+   1
+    \
+     2
+    /
+   3
+
+Output: [1,3,2]
+Follow up: Recursive solution is trivial, could you do it iteratively?
+
+// recurise
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> inorder;
+        
+        traversalRecursive(root, inorder);
+        return inorder;
+    }
+    
+    void traversalRecursive(TreeNode *node, vector<int>& list) {
+        if (node==NULL) return;
+        
+        traversalRecursive(node->left, list);
+        list.push_back(node->val);
+        traversalRecursive(node->right, list);
+    }
+};
+
+//iterative by stack
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> inorder;
+        stack<TreeNode *> ts;
+        TreeNode *cur=root;
+        
+        while (!ts.empty() || cur!=NULL) {
+            while (cur != NULL) {
+                ts.push(cur);
+                cur = cur->left;
+            }
+            
+            cur = ts.top(); ts.pop();
+            inorder.push_back(cur->val);
+            cur = cur->right;
+        }
+        
+        return inorder;
+    }
+    
+};
+
+//morris
+
+
+
+
+
+
+//no recursive, no stack, no morris
+// just code snippet
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> inorder;
+        bool leftdone = false;
+        TreeNode *cur = root;
+        
+        while (cur) {
+            if (leftdone==false) {
+                while (cur->left) cur = cur->left;
+            }
+            inorder.push_back(cur->val);
+            leftdone=true;
+            if (cur->right) {
+                cur =  cur->right;
+                leftdone = false;
+            } else if (cur->parent) {
+                //if this node is right child of its parent, visit parent's parent first
+                while (cur->parent && cur==cur->parent->right)
+                    cur = cur->parent;
+                if (!cur->parent)
+                    break;
+                cur = cur->parent;
+            }
+            
+        }
+        
+        return inorder;
+    }
+    
+};

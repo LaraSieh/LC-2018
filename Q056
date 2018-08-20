@@ -35,7 +35,7 @@ public:
         // merge them in order
         vector<Interval>  merged(1,intervals[0]);
         for (int i=1; i<intervals.size(); ++i) {
-            Interval last = merged.back(); 
+            Interval& last = merged.back();   // reference here is very important, can improve perform huge
             if (intervals[i].start > last.end) {
                 merged.push_back(intervals[i]);
             } else if (last.end < intervals[i].end) {

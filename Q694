@@ -1,0 +1,145 @@
+694. Number of Distinct Islands
+Given a non-empty 2D array grid of 0's and 1's, an island is a group of 1's (representing land) connected 4-directionally (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+Count the number of distinct islands. An island is considered to be the same as another if and only if one island can be translated (and not rotated or reflected) to equal the other.
+
+Example 1:
+11000
+11000
+00011
+00011
+Given the above grid map, return 1.
+Example 2:
+11011
+10000
+00001
+11011
+Given the above grid map, return 3.
+
+Notice that:
+11
+1
+and
+ 1
+11
+are considered different island shapes, because we do not consider reflection / rotation.
+Note: The length of each dimension in the given grid does not exceed 50.
+
+// my sol
+class Solution {
+public:
+    int numDistinctIslands(vector<vector<int>>& grid) {
+        m=(int)grid.size(), n=grid[0].size();
+        
+        for (int i=0; i<m; ++i) {
+            for (int j=0; j<n; ++j) {
+                if (grid[i][j] != 1) continue;
+                vector<vector<int>> island({{0,0}});
+                normalize(grid,i,j,i,j,island);
+                islands.insert(island);        
+            }
+        }
+        return islands.size();
+    }
+    
+    vector<vector<int>> dirs{{1,0},{-1,0},{0,1},{0,-1}};
+    void normalize(vector<vector<int>>& grid, int x0, int y0, int x, int y, vector<vector<int>>& island) {
+        grid[x][y] = -grid[x][y];
+        
+        for (int i=0; i<(int)dirs.size(); ++i) {
+            int xnew = x + dirs[i][0];
+            int ynew = y + dirs[i][1];
+            if (xnew>=0&&xnew<m&&ynew>=0&&ynew<n&&grid[xnew][ynew]==1) { 
+                island.push_back({xnew-x0, ynew-y0});
+                normalize(grid,x0,y0,xnew,ynew,island);
+            }
+            
+        }
+    }
+    
+private:
+    int m;
+    int n;
+    set<vector<vector<int>>> islands;
+};
+
+
+// inspired by code below, changed my sol to the following and it hits 100%
+class Solution {
+public:
+    int numDistinctIslands(vector<vector<int>>& grid) {
+        
+        set<vector<pair<int,int>>> islands;
+        for (int i=0; i<(int)grid.size(); ++i) {
+            for (int j=0; j<(int)grid[0].size(); ++j) {
+                if (grid[i][j] != 1) continue;
+                vector<pair<int,int>> island{{0,0}};
+                normalize(grid,i,j,i,j,island);
+                islands.insert(island);        
+            }
+        }
+        return islands.size();
+    }
+    
+    vector<vector<int>> dirs{{1,0},{-1,0},{0,1},{0,-1}};
+    void normalize(vector<vector<int>>& grid, int x0, int y0, int x, int y, vector<pair<int,int>>& island) {
+        grid[x][y] = -grid[x][y];
+        
+        for (int i=0; i<(int)dirs.size(); ++i) {
+            int xnew = x + dirs[i][0];
+            int ynew = y + dirs[i][1];
+            if (xnew>=0&&xnew<grid.size()&&ynew>=0&&ynew<grid[0].size()&&grid[xnew][ynew]==1) { 
+                island.push_back({xnew-x0, ynew-y0});
+                normalize(grid,x0,y0,xnew,ynew,island);
+            }
+            
+        }
+    }
+};
+
+// simliar idea, but hit 100%
+class Solution {
+public:
+    //Idea:  for two distince shape, their point visiting sequene started from the top left node is always the same
+    //http://www.cnblogs.com/grandyang/p/7698778.html
+    int numDistinctIslands(vector<vector<int>>& grid) {
+        if (grid.empty())
+            return 0;
+        
+        set<vector<pair<int, int>>> hash; // DFS points of each shape  NOTE: unordered_set does not support vector<>
+        
+        for (int r = 0; r < grid.size (); r++)
+        {
+            for (int c = 0; c < grid[0].size (); c++)
+            {
+                if (grid[r][c] == 1)  // always start at the left-top node of an island
+                {
+                    vector<pair<int,int>> shape;
+                
+                    DFS (grid, r, c, r, c, shape);
+                
+                    if (!shape.empty())
+                        hash.insert(shape); // automatically filter the identical shape island
+                }
+            }
+        }
+            
+        return hash.size ();
+    }
+    
+void DFS (vector<vector<int>>& grid, 
+         int srcR, int srcC, int r, int c,
+         vector<pair<int,int>> &shape)
+    {
+        if (r < 0 || r >= grid.size () || c < 0 || c >= grid[0].size () || grid[r][c] <= 0)
+            return;
+    
+        grid[r][c] *= -1; // mark as visited
+        shape.push_back ({r - srcR, c - srcC}); // save the relative coordinates compared to the left-top node of an island
+    
+        DFS(grid, srcR, srcC, r-1, c, shape);  // top
+        DFS(grid, srcR, srcC, r, c+1, shape);  // right
+        DFS(grid, srcR, srcC, r+1, c, shape);  // down
+        DFS(grid, srcR, srcC, r, c-1, shape);  // left
+    }
+};

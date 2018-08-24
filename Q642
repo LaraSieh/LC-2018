@@ -53,88 +53,153 @@ Please remember to RESET your class variables declared in class AutocompleteSyst
 
 
 
-// didn't pass compilation yet :(
-class AutocompleteSystem {    
+// memory limit exceed :(
+class AutocompleteSystem {  
 public:
-    
-    struct Trie {
-        Trie *children[26];
-        int count_;
-        Trie() : count_(0) {for (int i=0;i<26;++i) 
-                                children[i]=nullptr;
-                           };
-        
-        void insert(string& word, int c) {
-            Trie *node = this;
-        
-            for (int i=0; i<word.size(); ++i) {
-                int index = (int)(word[i]-'a');
-                if (node->children[index]==nullptr) 
-                    node->children[index] = new Trie();
-                node = node->children[index];
-            }
-            node->count_+=c;
-        }
-    };
-    
-    
     AutocompleteSystem(vector<string> sentences, vector<int> times) {
-        root_ = new Trie();
-        cur_ = root_;
-        for (int i=0; i<(int)sentences.size(); ++i) {
-            root_->insert(sentences[i],times[i]);
-        }        
+        root_ = new TrieNode();
+        reset();
+        for(int i = 0; i < sentences.size(); i++) buildTrie(sentences[i], times[i]);
     }
     
     vector<string> input(char c) {
-        if (c=='#') {
-            root_->insert(input_,1);
-            cleanup();
-            return {};
+        vector<string> aw;
+        if(c == '#'){
+            buildTrie(input_, 1);
+            reset();
+            return aw;
         }
         
-        vector<string> aw; //output auto complete word list
         input_.push_back(c);
-        if (!cur_|| !cur_->children[c-'a']) 
-            return {};
-        cur_ = cur_->children[c-'a'];
-        findTopWords(input_,cur_);
-        while (pq_.empty()) {
+        cur_ = cur_->children[c];
+        if(!cur_) cur_ = new TrieNode();
+        dfs(input_, cur_);
+        while(!pq_.empty()){
             aw.push_back(pq_.top().first);
             pq_.pop();
         }
-        reverse(aw.begin(),aw.end());
+        reverse(aw.begin(), aw.end());
         return aw;
     }
-
+    
 private:
-    struct cmp {
-        bool operator()(const pair<string,int>&p1, const pair<string,int>&p2) {
-            return p1.second == p2.second ? p1.first < p2.first : p1.second < p2.second;
+    struct TrieNode{
+        int count;
+        TrieNode* children[256];
+        TrieNode():count(0){for (int i=0; i<256; ++i) children[i]=nullptr;}
+    };
+        
+    struct cmp{
+        bool operator() (const pair<string, int>& p1, const pair<string, int>& p2){ 
+            return p1.second == p2.second ? p1.first < p2.first : p1.second > p2.second; 
         }
     };
     
-    void findTopWords(string& w, Trie *node) {
-        if (node->count_>0) {
-            pq_.push({w,node->count_});
-            while (pq_.size()>3) pq_.pop();
+    void buildTrie(string s, int count){
+        auto p = root_;
+        for(auto c: s){
+            if(!p->children[c]) p->children[c] = new TrieNode();
+            p = p->children[c];
         }
-        for (int i=0; i<26; ++i) {
-            if (node->children[i])
-            w.push_back(i+'a');
-            findTopWords(w,node->children[i]);
-            w.pop_back();
+        p->count += count;
+    }
+    
+    void dfs(string& s, TrieNode* p){
+        if(p->count>0){
+            pq_.push({s, p->count});
+            while(pq_.size() > 3) pq_.pop();
+        }
+    
+        for(int i=0; i<256; ++i){
+            TrieNode *node = p->children[i];
+            if (node) {
+                s.push_back(i);
+                dfs(s, node);
+                s.pop_back();
+            }
         }
     }
     
-    void cleanup() {
+    void reset(){
         cur_ = root_;
         input_ = "";
     }
     
-    unordered_map<string,int> wc_;
-    string input_;
-    Trie *root_;
-    Trie *cur_;
-    priority_queue<pair<string,int>,vector<pair<string,int>>,cmp> pq_;
+    TrieNode* root_;
+    TrieNode* cur_;
+    string    input_;
+    priority_queue<pair<string, int>, vector<pair<string, int>>, cmp> pq_;
+};
+
+// working one
+
+class AutocompleteSystem {  
+public:
+    AutocompleteSystem(vector<string> sentences, vector<int> times) {
+        root = new TrieNode();
+        reset();
+        for(int i = 0; i < sentences.size(); i++) buildTrie(sentences[i], times[i]);
+    }
+    
+    vector<string> input(char c) {
+        vector<string>res;
+        if(c == '#'){
+            buildTrie(sentence, 1);
+            reset();
+            return res;
+        }
+        sentence.push_back(c);
+        cur = cur->next[c];
+        if(!cur) cur = new TrieNode();
+        dfs(sentence, cur);
+        while(!pq.empty()){
+            res.push_back(pq.top().first);
+            pq.pop();
+        }
+        reverse(res.begin(), res.end());
+        return res;
+    }
+    
+private:
+    struct TrieNode{
+        int time;
+        unordered_map<char, TrieNode*>next;
+        TrieNode():time(0){}
+    };
+    TrieNode* root;
+    TrieNode* cur;
+    string sentence;
+    
+    struct Compare{
+        bool operator() (pair<string, int>& p1, pair<string, int>& p2){ 
+            return p1.second == p2.second ? p1.first < p2.first : p1.second > p2.second; 
+        }
+    };
+    priority_queue<pair<string, int>, vector<pair<string, int>>, Compare>pq;
+    
+    void buildTrie(string s, int time){
+        auto p = root;
+        for(auto c: s){
+            if(!p->next[c]) p->next[c] = new TrieNode();
+            p = p->next[c];
+        }
+        p->time += time;
+    }
+    
+    void dfs(string& s, TrieNode* p){
+        if(p->time){
+            pq.push({s, p->time});
+            while(pq.size() > 3) pq.pop();
+        }
+        for(auto x: p->next){
+            s.push_back(x.first);
+            dfs(s, x.second);
+            s.pop_back();
+        }
+    }
+    
+    void reset(){
+        cur = root;
+        sentence = "";
+    }
 };

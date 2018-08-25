@@ -87,5 +87,78 @@ private:
         } 
         return v[index];
     }
+};
 
+// use set<int> 70%
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
+        vector<int> classOrder(numCourses,-1); 
+        
+        vector<set<int>> dependents(numCourses);
+        vector<int> prerequires(numCourses,0);
+        
+        //build dependents and prerequires
+        for (auto &p : prerequisites) {
+            dependents[p.second].insert(p.first);
+            prerequires[p.first]++;
+        }
+        
+        int count=0;
+        queue<int> q;
+        for (int i=0; i<numCourses; ++i) {
+            if (prerequires[i]==0) {
+                q.push(i);
+            }
+        }
+        while (!q.empty()) {
+            int course=q.front(); q.pop();
+            classOrder[count++]= course;
+            for (int i : dependents[course]) {
+                --prerequires[i];
+                if (prerequires[i]==0)
+                    q.push(i);
+            }
+        }
+        
+        return (count==numCourses ? classOrder : vector<int>{});
+    }
+
+};
+
+
+// use vector<int> 90%
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
+        vector<int> classOrder(numCourses,-1); 
+        
+        vector<vector<int>> dependents(numCourses);
+        vector<int> prerequires(numCourses,0);
+        
+        //build dependents and prerequires
+        for (auto &p : prerequisites) {
+            dependents[p.second].push_back(p.first);
+            prerequires[p.first]++;
+        }
+        
+        int count=0;
+        queue<int> q;
+        for (int i=0; i<numCourses; ++i) {
+            if (prerequires[i]==0) {
+                q.push(i);
+            }
+        }
+        while (!q.empty()) {
+            int course=q.front(); q.pop();
+            classOrder[count++]= course;
+            for (int i : dependents[course]) {
+                --prerequires[i];
+                if (prerequires[i]==0)
+                    q.push(i);
+            }
+        }
+        
+        return (count==numCourses ? classOrder : vector<int>{});
+    }
 };

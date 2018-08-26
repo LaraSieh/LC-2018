@@ -1,0 +1,108 @@
+211. Add and Search Word - Data structure design
+Design a data structure that supports the following two operations:
+
+void addWord(word)
+bool search(word)
+search(word) can search a literal word or a regular expression string containing only letters a-z or .. A . means it can represent any one letter.
+
+Example:
+
+addWord("bad")
+addWord("dad")
+addWord("mad")
+search("pad") -> false
+search("bad") -> true
+search(".ad") -> true
+search("b..") -> true
+Note:
+You may assume that all words are consist of lowercase letters a-z.
+
+
+
+// added delete for deleting a word
+#define ALPHABET_SIZE 26
+#define INDEX(c)   ((int)c - (int)'a')
+
+class WordDictionary {
+    struct TrieNode {
+        TrieNode *children[ALPHABET_SIZE];
+        int       count;
+        TrieNode() : count(0) {for(int i=0; i<26;++i) children[i]=NULL;};
+        bool canDelete() { for (int i=0; i<ALPHABET_SIZE; ++i) {
+                            if (children[i]!=NULL && children[i]->count>0)
+                                return false;
+                            }
+                          return true;
+        }
+    };
+public:
+    /** Initialize your data structure here. */
+    WordDictionary() {
+        root = new TrieNode();
+    }
+    
+    /** Adds a word into the data structure. */
+    void addWord(string word) {
+        TrieNode *node = root;
+        int wc=0;
+        for (int i=0; i<(int)word.size();++i) {
+            int index = INDEX(word[i]);
+            if (node->children[index]==NULL) {
+                node->children[index] = new TrieNode();
+            }
+            node = node->children[index];
+            ++wc;
+        }
+        node->count = wc;
+    }
+    
+    /** Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter. */
+    bool search(string word) {
+        return searchWorker(root,word,0); 
+    }
+    
+    void deleteWords(string word) {
+        deleteWorker(root,word,0);    
+    }
+    
+    
+private:
+    bool searchWorker(TrieNode *node, const string& word, int index) {
+        if (index==word.size()) return (node->count>0);
+        if (node==NULL) return false;
+        if (word[index]=='.') {
+            for (int i=0; i<26; ++i) {
+                if (node->children[i] && searchWorker(node->children[i],word,index+1))
+                    return true;
+            }
+            return false;
+        } else {
+            return (node->children[INDEX(word[index])] && searchWorker(node->children[INDEX(word[index])],word,index+1));
+        }
+    }
+        
+    void deleteWorker(TrieNode *node, string& word, int index) {
+        TrieNode *child = node->children[INDEX(word[index])];
+        if (child==NULL) return;
+        
+        if (index==word.size()-1) {    
+            if ( child->count>0 ) 
+                child->count = 0; // make it not a word
+            return;
+        } 
+        deleteWorker(child,word,index+1);
+        if (child->canDelete()) {
+            node->children[INDEX(word[index])]=NULL;
+            delete child;
+        }
+    }
+    
+    TrieNode *root;
+};
+
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary obj = new WordDictionary();
+ * obj.addWord(word);
+ * bool param_2 = obj.search(word);
+ */

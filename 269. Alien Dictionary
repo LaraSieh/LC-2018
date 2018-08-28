@@ -1,0 +1,93 @@
+There is a new alien language which uses the latin alphabet. However, the order among letters are unknown to you. You receive a list of non-empty words from the dictionary, where words are sorted lexicographically by the rules of this new language. Derive the order of letters in this language.
+
+Example 1:
+
+Input:
+[
+  "wrt",
+  "wrf",
+  "er",
+  "ett",
+  "rftt"
+]
+
+Output: "wertf"
+Example 2:
+
+Input:
+[
+  "z",
+  "x"
+]
+
+Output: "zx"
+Example 3:
+
+Input:
+[
+  "z",
+  "x",
+  "z"
+] 
+
+Output: "" 
+
+Explanation: The order is invalid, so return "".
+Note:
+
+You may assume all letters are in lowercase.
+You may assume that if a is a prefix of b, then a must appear before b in the given dictionary.
+If the order is invalid, return an empty string.
+There may be multiple valid order of letters, return any one of them is fine.
+
+
+class Solution {
+public:
+    string alienOrder(vector<string>& words) {
+        string alphabet;
+        unordered_set<char> charSet;
+        unordered_map<char, set<char>> g; //order graph for all chars
+        vector<int> in(256,0);
+        queue<char> q;
+        
+        for (auto& w : words) charSet.insert(w.begin(),w.end());
+        // build char relation graph
+        for (int i=0; i<words.size()-1;++i) {
+            int n1= words[i].size(), n2=words[i+1].size();
+            int n = min(n1,n2), j=0;
+            for (;j<n;++j) {
+                if (words[i][j] != words[i+1][j]) {
+                    g[words[i][j]].insert(words[i+1][j]);
+                    break;
+                }
+            }
+            if (j==n && n1>n2) return "";
+        }
+        
+        for (auto& s : g) {
+            for (auto c : s.second) 
+                in[c]++;
+        }
+        
+        //initialize queue
+        for (auto a : charSet) {
+            if (in[a]==0) {
+                q.push(a); //letter that doesn't have precedence
+                alphabet += a;
+            }
+        }
+        
+        while (!q.empty()) {
+            char c=q.front(); q.pop();
+            for (auto a: g[c]) {
+                --in[a];
+                if (in[a]==0) {
+                    q.push(a);
+                    alphabet += a;
+                }
+            }
+        }
+        
+        return (alphabet.size() == charSet.size() ? alphabet : "");
+    }
+};

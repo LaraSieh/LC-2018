@@ -1,0 +1,147 @@
+173. Binary Search Tree Iterator
+Implement an iterator over a binary search tree (BST). Your iterator will be initialized with the root node of a BST.
+
+Calling next() will return the next smallest number in the BST.
+
+Note: next() and hasNext() should run in average O(1) time and uses O(h) memory, where h is the height of the tree.
+
+
+//using stack
+
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class BSTIterator {
+public:
+    BSTIterator(TreeNode *root) {
+        while (root) {
+            m_stack.push(root);
+            root = root->left;
+        }
+    }
+
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        return !m_stack.empty();
+    }
+
+    /** @return the next smallest number */
+    int next() {
+        TreeNode *cur = m_stack.top();
+        m_stack.pop();
+        int nextVal = cur->val;
+        
+        cur = cur->right;
+        while (cur) {
+            m_stack.push(cur);
+            cur = cur->left;
+        }
+        return nextVal;
+    }
+
+private:
+    stack<TreeNode *> m_stack;
+};
+
+
+// using morris method
+class BSTIterator {
+public:
+    /*
+    * @param root: The root of binary tree.
+    */BSTIterator(TreeNode * root) {
+        base_ = root;
+        cur_= findNext();
+    }
+
+    /*
+     * @return: True if there has next node, or false
+     */
+    bool hasNext() {
+        return (cur_!=nullptr);
+    }
+
+    /*
+     * @return: return next node
+     */
+    TreeNode * next() {
+        TreeNode *cur = cur_; 
+        cur_ = findNext();
+        return cur;
+    }
+
+private:
+    TreeNode *findNext() {
+        TreeNode *next = nullptr;
+        while (base_) {
+            if (base_->left==nullptr) {
+                next = base_;
+                base_ = base_->right;
+                break;
+            } else {
+                TreeNode *pre = base_->left;
+                while (pre->right && pre->right != base_) {
+                    pre = pre->right;
+                }
+                if (pre->right == nullptr) {
+                    pre->right = base_;
+                    base_ = base_->left;
+                } else { // pre->right == base_
+                    pre->right = nullptr;
+                    next = base_;
+                    base_ = base_->right;
+                    break;
+                }
+            }
+        }
+        return next;
+    }
+
+    TreeNode *cur_;
+    TreeNode *base_;
+};
+
+
+// O(1) for both hasNext() and next()
+class BSTIterator {
+public:
+    /*
+    * @param root: The root of binary tree.
+    */BSTIterator(TreeNode * root) {
+        inorderTraversal(root);
+        cur_ = 0;
+        total_ = inorder_.size();
+    }
+
+    /*
+     * @return: True if there has next node, or false
+     */
+    bool hasNext() {
+        return (cur_<total_);
+    }
+
+    /*
+     * @return: return next node
+     */
+    TreeNode * next() {
+        return inorder_[cur_++];
+    }
+
+private:
+    void inorderTraversal(TreeNode *node) {
+        if (node==nullptr) return;
+        inorderTraversal(node->left);
+        inorder_.push_back(node);
+        inorderTraversal(node->right);
+    }
+    
+    vector<TreeNode *> inorder_;
+    int cur_;
+    int total_;
+};
